@@ -1,4 +1,4 @@
-import { BoardState } from "./BoardState"
+import { BoardState } from "../src/core/BoardState"
 
 const s = "x9/".repeat(8) + "8f2tx63f"
 const state = BoardState.deserialise(s)
