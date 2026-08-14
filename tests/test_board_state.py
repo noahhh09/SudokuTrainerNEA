@@ -30,6 +30,5 @@ assert state.getAllCandidates() == [[[1,2,3,4,5,6,7,8,9] for _ in range(9)] for 
 
 while NakedSingle.findAvailable(state) == []:
     state = createRandomBoardState()
-print(NakedSingle.findAvailable(state))
 print(state)
-NakedSingle().checkIfAvailable(state)
+print(NakedSingle.findAvailable(state))
