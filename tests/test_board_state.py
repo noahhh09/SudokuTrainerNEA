@@ -28,6 +28,8 @@ def createRandomBoardState() -> BoardState:
 state = createEmptyBoardState()
 assert state.getAllCandidates() == [[[1,2,3,4,5,6,7,8,9] for _ in range(9)] for _ in range(9)]
 
-state = createRandomBoardState()
+while NakedSingle.findAvailable(state) == []:
+    state = createRandomBoardState()
+print(NakedSingle.findAvailable(state))
 print(state)
 NakedSingle().checkIfAvailable(state)
