@@ -10,6 +10,9 @@ class Technique:
     def findAvailable(state: BoardState) -> list[Technique]:
         raise NotImplementedError
 
+    def __repr__(self) -> str:
+        return self.__str__()
+
 
 class NakedSingle(Technique):
     def __init__(self, moves: list[Move]) -> None:
@@ -27,3 +30,6 @@ class NakedSingle(Technique):
                     found.append(NakedSingle([ValueChangeMove(i, j, 0, candidates[i][j][0])]))
 
         return found
+
+    def __str__(self) -> str:
+        return f"NakedSingle({self.moves[0]})"
