@@ -1,3 +1,4 @@
+from src.core.Technique import NakedSingle
 from src.core.BoardState import BoardState
 from src.core.Cell import Cell
 import random
@@ -24,4 +25,9 @@ def createRandomBoardState() -> BoardState:
 
     return state
 
-print(createRandomBoardState())
+state = createEmptyBoardState()
+assert state.getAllCandidates() == [[[1,2,3,4,5,6,7,8,9] for _ in range(9)] for _ in range(9)]
+
+state = createRandomBoardState()
+print(state)
+NakedSingle().checkIfAvailable(state)
