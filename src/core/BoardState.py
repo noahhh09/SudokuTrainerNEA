@@ -10,16 +10,8 @@ class BoardState:
     def getRow(self, rowIndex: int) -> list[Cell]:
         return self.__cells[rowIndex]
 
-    # getColumn() NOT IMPLEMENTED!
-    # Original TS Code:
-    #
-    # getColumn(index: number): Cell[] {
-    #     return this.cells.map((_, colIndex) => this.cells.map(row => row[colIndex]))[index]
-    # }
-    #
-
     def getColumn(self, colIndex: int) -> list[Cell]:
-        raise NotImplementedError()
+        return [self.__cells[i][colIndex] for i in range(9)]
 
     def getBlock(self, index: int) -> list[Cell]:
         startRow = (index // 3) * 3
@@ -38,6 +30,8 @@ class BoardState:
 
     """
         Returns an array of cells (in a similar way to BoardState) where each cell contains an array of all available candidates based on what values are in the current BoardState
+
+        Filled cells will be treated as having no candidates regardless.
     """
     def getAllCandidates(self) -> list[list[list[int]]]:
         # 1. Iterate through each cell, and add its value, if applicable, to its respective row, col, and block's "contents"
