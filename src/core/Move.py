@@ -1,4 +1,4 @@
-from core.BoardState import BoardState
+from .BoardState import BoardState
 
 
 class Move:

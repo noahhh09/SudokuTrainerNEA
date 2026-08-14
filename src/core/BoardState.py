@@ -75,7 +75,7 @@ class BoardState:
         # (essentially: rowAvailables ∩ colAvailables ∩ blkAvailables)
         for i in range(9):
             for j in range(9):
-                if self.__cells[i][j].getValue() is None:
+                if self.__cells[i][j].getValue() is not None:
                     continue
 
                 blockIdx = self.getBlockIndex(i, j)

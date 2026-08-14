@@ -1,5 +1,5 @@
-from core.Move import Move
-from core.Stack import Stack
+from .Move import Move
+from .Stack import Stack
 
 
 class Game:
