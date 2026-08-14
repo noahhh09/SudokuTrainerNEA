@@ -12,6 +12,12 @@ class Move:
     def undo(self, board: BoardState):
         raise NotImplementedError
 
+    def __str__(self) -> str:
+        return f"Move({self.row}, {self.col})"
+
+    def __repr__(self) -> str:
+        return self.__str__()
+
 
 class ValueChangeMove(Move):
     def __init__(self, row: int, col: int, oldValue: int, newValue: int) -> None:
@@ -33,10 +39,20 @@ class ValueChangeMove(Move):
         if cell.isEditable():
             cell.setValue(self.oldValue)
 
+    def __str__(self) -> str:
+        return f"ValueChangeMove({self.row}, {self.col}, {self.oldValue}, {self.newValue})"
+
 class CandidateChangeMove(Move):
     def __init__(self, row: int, col: int, candidateNumber: int, wasAdded: bool) -> None:
         super().__init__(row, col)
         self.candidateNumber = candidateNumber
         self.wasAdded = wasAdded
 
-    # TODO Implement
+    def apply(self, board: BoardState):
+        raise NotImplementedError
+
+    def undo(self, board: BoardState):
+        raise NotImplementedError
+
+    def __str__(self) -> str:
+        return f"CandidateChangeMove({self.row}, {self.col}, {self.candidateNumber}, {self.wasAdded})"
