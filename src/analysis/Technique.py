@@ -1,5 +1,7 @@
-from .Move import Move, ValueChangeMove
-from .BoardState import BoardState
+from . import BoardUtils
+
+from ..core.Move import Move, ValueChangeMove
+from ..core.BoardState import BoardState
 
 
 class Technique:
@@ -20,7 +22,7 @@ class NakedSingle(Technique):
 
     @staticmethod
     def findAvailable(state: BoardState) -> list[Technique]:
-        candidates = state.getAllCandidates()
+        candidates = BoardUtils.getAllCandidates(state)
 
         found: list[Technique] = []
 

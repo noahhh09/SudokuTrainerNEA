@@ -1,4 +1,5 @@
-from src.core.Technique import NakedSingle
+from src.analysis import BoardUtils
+from src.analysis.Technique import NakedSingle
 from src.core.BoardState import BoardState
 from src.core.Cell import Cell
 import random
@@ -26,7 +27,7 @@ def createRandomBoardState() -> BoardState:
     return state
 
 state = createEmptyBoardState()
-assert state.getAllCandidates() == [[[1,2,3,4,5,6,7,8,9] for _ in range(9)] for _ in range(9)]
+assert BoardUtils.getAllCandidates(state) == [[[1,2,3,4,5,6,7,8,9] for _ in range(9)] for _ in range(9)]
 
 while NakedSingle.findAvailable(state) == []:
     state = createRandomBoardState()
