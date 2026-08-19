@@ -28,6 +28,13 @@ class BoardState:
     def getBlockIndex(self, row: int, col: int) -> int:
         return (row // 3) * 3 + col // 3
 
+    # Gets the position of the nth element inside a block.
+    def getPositionInBlock(self, blockIndex: int, n: int) -> tuple[int, int]:
+        row = (blockIndex // 3) * 3 + (n // 3)
+        col = (blockIndex * 3) % 9 + (n % 3)
+
+        return (row, col)
+
     """
     Returns the respective serialised string for the currently stored BoardState. 
     """
