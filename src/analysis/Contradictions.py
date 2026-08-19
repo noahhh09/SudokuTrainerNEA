@@ -29,34 +29,34 @@ def detectContradictions(state: BoardState) -> list[Contradiction]:
     # Check rows
     for i in range(0, 9):
         unit = state.getRow(i)
-        unitResults = _checkUnit(unit)
+        duplicates = _getDuplicatesInUnit(unit)
 
-        for value, positions in unitResults.items():
+        for value, positions in duplicates.items():
             contra = Contradiction(value, UnitType.ROW, i, [(i, x) for x in positions])
             allContradictions.append(contra)
 
     # Check cols
     for j in range(0, 9):
         unit = state.getColumn(j)
-        unitResults = _checkUnit(unit)
+        duplicates = _getDuplicatesInUnit(unit)
 
-        for value, positions in unitResults.items():
+        for value, positions in duplicates.items():
             contra = Contradiction(value, UnitType.COLUMN, j, [(x, j) for x in positions])
             allContradictions.append(contra)
 
     # Check blocks
     for k in range(0, 9):
         unit = state.getBlock(k)
-        unitResults = _checkUnit(unit)
+        duplicates = _getDuplicatesInUnit(unit)
 
-        for value, positions in unitResults.items():
+        for value, positions in duplicates.items():
             contra = Contradiction(value, UnitType.BLOCK, k, [state.getPositionInBlock(k, x) for x in positions])
             allContradictions.append(contra)
 
     return allContradictions
     
 
-def _checkUnit(unit: list[Cell]) -> dict[int, list[int]]:
+def _getDuplicatesInUnit(unit: list[Cell]) -> dict[int, list[int]]:
     instances: dict[int, list[int]] = {} # Stores positional index of instances of each unique digit.
 
     for i in range(9):
