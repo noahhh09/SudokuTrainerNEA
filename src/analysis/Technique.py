@@ -29,7 +29,7 @@ class NakedSingle(Technique):
         for i in range(9):
             for j in range(9):
                 if len(candidates[i][j]) == 1:
-                    found.append(NakedSingle([ValueChangeMove(i, j, 0, candidates[i][j][0])]))
+                    found.append(NakedSingle([ValueChangeMove(i, j, None, candidates[i][j][0])]))
 
         return found
 

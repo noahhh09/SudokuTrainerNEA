@@ -22,7 +22,7 @@ class Move:
 
 
 class ValueChangeMove(Move):
-    def __init__(self, row: int, col: int, oldValue: int, newValue: int) -> None:
+    def __init__(self, row: int, col: int, oldValue: int | None, newValue: int | None) -> None:
         super().__init__(row, col)
         self.oldValue = oldValue
         self.newValue = newValue
