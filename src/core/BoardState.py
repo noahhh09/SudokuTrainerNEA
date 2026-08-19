@@ -15,7 +15,7 @@ class BoardState:
 
     def getBlock(self, index: int) -> list[Cell]:
         startRow = (index // 3) * 3
-        startCol = (index * 3) % 9
+        startCol = (index % 3) * 3
 
         result: list[Cell] = []
 
@@ -31,7 +31,7 @@ class BoardState:
     # Gets the position of the nth element inside a block.
     def getPositionInBlock(self, blockIndex: int, n: int) -> tuple[int, int]:
         row = (blockIndex // 3) * 3 + (n // 3)
-        col = (blockIndex * 3) % 9 + (n % 3)
+        col = (blockIndex % 3) * 3 + (n % 3)
 
         return (row, col)
 
