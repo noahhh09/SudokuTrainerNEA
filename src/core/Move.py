@@ -12,9 +12,11 @@ class Move:
     def undo(self, board: BoardState):
         raise NotImplementedError
 
+    # Used for debugging.
     def __str__(self) -> str:
         return f"Move({self.row}, {self.col})"
 
+    # Used for debugging.
     def __repr__(self) -> str:
         return self.__str__()
 

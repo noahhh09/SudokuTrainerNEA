@@ -91,7 +91,8 @@ class BoardState:
                     currentCol += 1
 
         return BoardState(finalArray)
-        
+
+    # Used for debugging. Makes BoardStates actually look nice when printed out.
     def __str__(self):
         string = "\n"
 
