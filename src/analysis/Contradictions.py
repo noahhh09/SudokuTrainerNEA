@@ -11,11 +11,11 @@ class UnitType(Enum):
 
 class Contradiction:
     # A 'unit' is defined as an array of 9 cells. It's an instance of a row, column, or block.
-    def __init__(self, value: int, unitType: UnitType, unitIndex: int, cellsInvolved: list[tuple[int, int]]) -> None:
+    def __init__(self, value: int, unitType: UnitType, unitIndex: int, positionsInvolved: list[tuple[int, int]]) -> None:
         self.value = value
         self.unitType = unitType
         self.unitIndex = unitIndex
-        self.cellsInvolved = cellsInvolved
+        self.cellsInvolved = positionsInvolved
 
     def __str__(self) -> str:
         return f"Contradiction(value:{self.value}, type:{self.unitType}, unitIndex: {self.unitIndex}, cells:{self.cellsInvolved})"
