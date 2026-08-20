@@ -32,6 +32,10 @@ class Cell:
 
         self.__candidates.add(value)
 
+    def addCandidates(self, values: set[int]):
+        for value in values:
+            self.addCandidate(value)
+
     def removeCandidate(self, value: int):
         if not self.__editable:
             raise Exception("Cell is not editable.")
