@@ -37,9 +37,6 @@ class NakedSingle(Technique):
 
         return found
 
-    def __str__(self) -> str:
-        return f"NakedSingle({self.moves[0]})"
-
 
 class HiddenSingle(Technique):
     def __init__(self, moves: list[Move]) -> None:
