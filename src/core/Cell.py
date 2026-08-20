@@ -1,8 +1,12 @@
 class Cell:
-    def __init__(self, value: int | None = None, editable: bool = False, candidates: set[int] = set()):
+    def __init__(self, value: int | None = None, editable: bool = False, candidates: set[int] | None = None):
         self.__value = value
         self.__editable = editable
-        self.__candidates = candidates
+
+        if candidates is None:
+            self.__candidates = set()
+        else:
+            self.__candidates = candidates.copy()
 
     def setValue(self, value: int | None):
         if not self.__editable:
