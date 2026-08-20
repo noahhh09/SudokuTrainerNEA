@@ -49,7 +49,6 @@ class HiddenSingle(Technique):
         found: list[Technique] = []
 
         for i in range(9):
-            print("ROW", i)
             unit = candidateState.getRow(i)
             hiddenSingles = HiddenSingle._findHiddenSinglesInUnit(unit)
             for digit, col in hiddenSingles.items():
@@ -57,20 +56,16 @@ class HiddenSingle(Technique):
                 found.append(tech)
 
         for j in range(9):
-            print("COL", j)
             unit = candidateState.getColumn(j)
             hiddenSingles = HiddenSingle._findHiddenSinglesInUnit(unit)
             for digit, row in hiddenSingles.items():
-                print("COL", j, digit, row)
                 tech = HiddenSingle([ValueChangeMove(row, j, None, digit)])
                 found.append(tech)
 
         for k in range(9):
-            print("BLK", k)
             unit = candidateState.getBlock(k)
             hiddenSingles = HiddenSingle._findHiddenSinglesInUnit(unit)
             for digit, index in hiddenSingles.items():
-                print("BLK", k, digit, index)
                 row, col = candidateState.getPositionInBlock(k, index)
                 tech = HiddenSingle([ValueChangeMove(row, col, None, digit)])
                 found.append(tech)
@@ -88,13 +83,10 @@ class HiddenSingle(Technique):
 
             for i in range(9):
                 candidates = unit[i].getCandidates()
-                print("--CHK", i, candidates)
                 if digit in candidates:
                     if position is None:
-                        print("Found", digit, i)
                         position = i
                     else:
-                        print("Rejecting", digit, i)
                         position = None
                         break # Since this means it's repeated..
 
