@@ -26,14 +26,15 @@ class NakedSingle(Technique):
 
     @staticmethod
     def findAvailable(state: BoardState) -> list[Technique]:
-        candidates = BoardUtils.getAllCandidates(state)
+        candidateState = BoardUtils.copyAndPopulateCandidates(state)
 
         found: list[Technique] = []
 
         for i in range(9):
             for j in range(9):
-                if len(candidates[i][j]) == 1:
-                    found.append(NakedSingle([ValueChangeMove(i, j, None, candidates[i][j][0])]))
+                candidates = candidateState.getCell(i, j).getCandidates()
+                if len(candidates) == 1:
+                    found.append(NakedSingle([ValueChangeMove(i, j, None, list(candidates)[0])]))
 
         return found
 

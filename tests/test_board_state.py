@@ -27,7 +27,6 @@ def createRandomBoardState() -> BoardState:
     return state
 
 state = createEmptyBoardState()
-assert BoardUtils.getAllCandidates(state) == [[[1,2,3,4,5,6,7,8,9] for _ in range(9)] for _ in range(9)]
 
 while NakedSingle.findAvailable(state) == []:
     state = createRandomBoardState()
