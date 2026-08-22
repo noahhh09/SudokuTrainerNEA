@@ -23,17 +23,17 @@ class SudokuGrid(ctk.CTkFrame):
 
             self.sudokuCells.append(row)
 
-        self.refresh()
+        self.redraw()
 
-    def refresh(self):
+    def redraw(self):
         for i in range(9):
             for j in range(9):
-                self.sudokuCells[i][j].refresh(self.boardState.getCell(i, j))
+                self.sudokuCells[i][j].redraw(self.boardState.getCell(i, j))
 
         contradictions = Contradictions.detectContradictions(self.boardState)
         for contra in contradictions:
             for x, y in contra.cellsInvolved:
-                self.sudokuCells[x][y].refresh(contradiction=True)
+                self.sudokuCells[x][y].redraw(contradiction=True)
 
 
 class SudokuCell(ctk.CTkFrame):
@@ -52,7 +52,7 @@ class SudokuCell(ctk.CTkFrame):
         self.valueLabel = ctk.CTkLabel(self, text=str(cell.getValue() or ""), font=SudokuCell.largeFont)
         self.valueLabel.place(relx=0.5, rely=0.5, anchor="center")
 
-    def refresh(self, cell: Cell | None = None, contradiction: bool = False):
+    def redraw(self, cell: Cell | None = None, contradiction: bool = False):
         if cell is not None:
             self.cell = cell
 
