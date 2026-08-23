@@ -1,6 +1,7 @@
 from typing import Any, Tuple
 
 import customtkinter as ctk
+import tkinter as tk
 
 from src.analysis import Contradictions
 from src.core.BoardState import BoardState
@@ -8,7 +9,7 @@ from src.core.Cell import Cell
 
 class SudokuGrid(ctk.CTkFrame):
     def __init__(self, master: Any, boardState: BoardState, width: int = 640, height: int = 640, **kwargs):
-        super().__init__(master, width, height, **kwargs)
+        super().__init__(master, width, height, fg_color="black", **kwargs)
 
         self.boardState = boardState
         self.sudokuCells: list[list[SudokuCell]] = []
@@ -17,8 +18,12 @@ class SudokuGrid(ctk.CTkFrame):
             row: list[SudokuCell] = []
 
             for j in range(9):
-                cell = SudokuCell(self, boardState.getCell(i, j))
-                cell.grid(row=i, column=j, padx=1, pady=1)
+                cell = SudokuCell(self, i, j, boardState.getCell(i, j))
+
+                leftpad = 5 if (j % 3 == 0 and j != 0) else 1
+                toppad = 5 if (i % 3 == 0 and i != 0) else 1
+
+                cell.grid(row=i, column=j, padx=(leftpad, 1), pady=(toppad, 1))
                 row.append(cell)
 
             self.sudokuCells.append(row)
@@ -37,57 +42,45 @@ class SudokuGrid(ctk.CTkFrame):
 
 
 class SudokuCell(ctk.CTkFrame):
-    largeFont = None
+    valueFont = None
     candidateFont = None
 
-    def __init__(self, master: Any, cell: Cell, size=64, **kwargs):
-        super().__init__(master, width=size, height=size, border_width=2, border_color="#000000", corner_radius=0, **kwargs)
+    def __init__(self, master: Any, row: int, col: int, cell: Cell, size=64, **kwargs):
+        super().__init__(master, width=size, height=size, **kwargs)
 
+        self.row = row
+        self.col = col
         self.cell = cell
+        self.size = size
 
-        if SudokuCell.largeFont is None or SudokuCell.candidateFont is None:
-            SudokuCell.largeFont = ctk.CTkFont(size=20, weight='bold')
-            SudokuCell.candidateFont = ctk.CTkFont(size=10)
+        if SudokuCell.valueFont is None or SudokuCell.candidateFont is None:
+            SudokuCell.valueFont = ctk.CTkFont(size=self.size // 3 + 8, weight='bold')
+            SudokuCell.candidateFont = ctk.CTkFont(size=self.size // 8 + 4)
 
         self.pack_propagate(False)
-        self.grid_propagate(False)
 
-        self.valueLabel = ctk.CTkLabel(self, text=str(cell.getValue() or ""), font=SudokuCell.largeFont)
-
-        self.candidateLabels: list[ctk.CTkLabel] = []
-        for i in range(0, 9):
-            label = ctk.CTkLabel(self, text=str(i+1), font=SudokuCell.candidateFont, fg_color="transparent", text_color="#aaaaaa", width=0, height=0)
-            self.candidateLabels.append(label)
-
-        for i in range(3):
-            self.rowconfigure(i, weight=1)
-            self.columnconfigure(i, weight=1)
-
-        self.valueLabel.lift()
+        self.canvas = tk.Canvas(self, width=self.size, height=self.size)
+        self.canvas.pack()
 
     def redraw(self, cell: Cell | None = None, contradiction: bool = False):
         if cell is not None:
             self.cell = cell
 
+        assert SudokuCell.valueFont
+        assert SudokuCell.candidateFont
+
+        self.canvas.delete("all")
+
         if self.cell.getValue() is not None:
-            for label in self.candidateLabels:
-                label.grid_forget()
-
-            self.valueLabel.configure(text=str(self.cell.getValue() or ""))
-            self.valueLabel.place(relx=0.5, rely=0.5, anchor="center")
+            self.canvas.create_text(self.size // 2, self.size // 2, text=str(self.cell.getValue()), font=SudokuCell.valueFont, tags="value")
         else:
-            self.valueLabel.place_forget()
+            for candidate in self.cell.getCandidates():
+                row = (candidate - 1) // 3
+                col = (candidate - 1) % 3
 
-            candidates = self.cell.getCandidates()
-
-            for i, label in enumerate(self.candidateLabels):
-                if i + 1 in candidates:
-                    label.grid(row=(i // 3), column=(i % 3), padx=2, pady=2, sticky="nsew")
-                else:
-                    label.grid_forget()
-
+                self.canvas.create_text((col + 0.5) * (self.size / 3), (row + 0.5) * (self.size / 3), font=SudokuCell.candidateFont, text=candidate, tags="candidate", fill="#444444")
 
         if contradiction:
-            self.configure(fg_color="#ff0000")
+            self.canvas.configure(bg="#ff0000")
         else:
-            self.configure(fg_color="transparent")
+            self.canvas.configure(bg="white")
