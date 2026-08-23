@@ -14,6 +14,6 @@ class App(customtkinter.CTk):
         self.title("Sudoku Trainer")
         self.geometry("1280x720")
 
-        self.boardState = BoardUtils.copyAndPopulateCandidates(createRandomBoardState())
+        self.boardState = createRandomBoardState(64)
         self.sudokuGrid = SudokuGrid(self, self.boardState)
         self.sudokuGrid.place(relx=0.01, rely=0.5, anchor="w")

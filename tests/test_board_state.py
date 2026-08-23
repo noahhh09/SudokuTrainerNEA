@@ -14,10 +14,10 @@ def createEmptyBoardState() -> BoardState:
     return BoardState(board)
 
 
-def createRandomBoardState() -> BoardState:
+def createRandomBoardState(n: int) -> BoardState:
     state = createEmptyBoardState()
 
-    for _ in range(0, 16):
+    for _ in range(0, n):
         row = random.randint(0, 8)
         col = random.randint(0, 8)
         value = random.randint(1, 9)
@@ -29,6 +29,6 @@ def createRandomBoardState() -> BoardState:
 state = createEmptyBoardState()
 
 while NakedSingle.findAvailable(state) == []:
-    state = createRandomBoardState()
+    state = createRandomBoardState(64)
 # print(state)
 # print(NakedSingle.findAvailable(state))
