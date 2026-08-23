@@ -1,4 +1,4 @@
-from typing import Any, Tuple
+from typing import Any, Callable
 
 import customtkinter as ctk
 import tkinter as tk
@@ -13,12 +13,13 @@ class SudokuGrid(ctk.CTkFrame):
 
         self.boardState = boardState
         self.sudokuCells: list[list[SudokuCell]] = []
+        self.selectedCellPosition: tuple[int | None, int | None] = (None, None)
 
         for i in range(9):
             row: list[SudokuCell] = []
 
             for j in range(9):
-                cell = SudokuCell(self, i, j, boardState.getCell(i, j))
+                cell = SudokuCell(self, i, j, boardState.getCell(i, j), self.selectCell)
 
                 leftpad = 5 if (j % 3 == 0 and j != 0) else 1
                 toppad = 5 if (i % 3 == 0 and i != 0) else 1
@@ -29,6 +30,9 @@ class SudokuGrid(ctk.CTkFrame):
             self.sudokuCells.append(row)
 
         self.redraw()
+
+    def selectCell(self, row, col):
+        self.selectedCellPosition = (row, col)
 
     def redraw(self):
         for i in range(9):
@@ -58,13 +62,15 @@ class SudokuCell(ctk.CTkFrame):
     valueFont = None
     candidateFont = None
 
-    def __init__(self, master: Any, row: int, col: int, cell: Cell, size=64, **kwargs):
+    def __init__(self, master: Any, row: int, col: int, cell: Cell, onSelectCallback, size=64, **kwargs):
         super().__init__(master, width=size, height=size, **kwargs)
 
         self.row = row
         self.col = col
         self.cell = cell
         self.size = size
+
+        self.onSelectCallback = onSelectCallback
 
         if SudokuCell.valueFont is None or SudokuCell.candidateFont is None:
             SudokuCell.valueFont = ctk.CTkFont(size=self.size // 3 + 8, weight='bold')
@@ -74,6 +80,11 @@ class SudokuCell(ctk.CTkFrame):
 
         self.canvas = tk.Canvas(self, width=self.size, height=self.size)
         self.canvas.pack()
+        self.canvas.bind("<Button-1>", self._onClick)
+
+    def _onClick(self, event):
+        if self.onSelectCallback is not None:
+            self.onSelectCallback(self.row, self.col)
 
     def redraw(self, cell: Cell | None = None):
         if cell is not None:
