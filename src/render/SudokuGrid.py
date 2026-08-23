@@ -38,28 +38,54 @@ class SudokuGrid(ctk.CTkFrame):
 
 class SudokuCell(ctk.CTkFrame):
     largeFont = None
+    candidateFont = None
 
     def __init__(self, master: Any, cell: Cell, size=64, **kwargs):
-        super().__init__(master, width=size, height=size, border_width=2, border_color="#000000", **kwargs)
+        super().__init__(master, width=size, height=size, border_width=2, border_color="#000000", corner_radius=0, **kwargs)
 
         self.cell = cell
 
-        if SudokuCell.largeFont is None:
+        if SudokuCell.largeFont is None or SudokuCell.candidateFont is None:
             SudokuCell.largeFont = ctk.CTkFont(size=20, weight='bold')
+            SudokuCell.candidateFont = ctk.CTkFont(size=10)
 
         self.pack_propagate(False)
+        self.grid_propagate(False)
 
         self.valueLabel = ctk.CTkLabel(self, text=str(cell.getValue() or ""), font=SudokuCell.largeFont)
-        self.valueLabel.place(relx=0.5, rely=0.5, anchor="center")
+
+        self.candidateLabels: list[ctk.CTkLabel] = []
+        for i in range(0, 9):
+            label = ctk.CTkLabel(self, text=str(i+1), font=SudokuCell.candidateFont, fg_color="transparent", text_color="#aaaaaa", width=0, height=0)
+            self.candidateLabels.append(label)
+
+        for i in range(3):
+            self.rowconfigure(i, weight=1)
+            self.columnconfigure(i, weight=1)
+
+        self.valueLabel.lift()
 
     def redraw(self, cell: Cell | None = None, contradiction: bool = False):
         if cell is not None:
             self.cell = cell
 
-        self.valueLabel.configure(text=str(self.cell.getValue() or ""))
+        if self.cell.getValue() is not None:
+            for label in self.candidateLabels:
+                label.grid_forget()
 
-        if self.cell.getValue() is None:
-            pass # populate candidates here
+            self.valueLabel.configure(text=str(self.cell.getValue() or ""))
+            self.valueLabel.place(relx=0.5, rely=0.5, anchor="center")
+        else:
+            self.valueLabel.place_forget()
+
+            candidates = self.cell.getCandidates()
+
+            for i, label in enumerate(self.candidateLabels):
+                if i + 1 in candidates:
+                    label.grid(row=(i // 3), column=(i % 3), padx=2, pady=2, sticky="nsew")
+                else:
+                    label.grid_forget()
+
 
         if contradiction:
             self.configure(fg_color="#ff0000")
