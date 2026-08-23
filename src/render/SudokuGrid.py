@@ -35,10 +35,23 @@ class SudokuGrid(ctk.CTkFrame):
             for j in range(9):
                 self.sudokuCells[i][j].redraw(self.boardState.getCell(i, j))
 
+        self.updateContradictions()
+
+    def redrawCell(self, row: int, col: int):
+        self.sudokuCells[row][col].redraw(self.boardState.getCell(row, col))
+        self.updateContradictions()
+
+    def updateContradictions(self):
         contradictions = Contradictions.detectContradictions(self.boardState)
+        cellsWithContradictions: set[tuple[int, int]] = set()
+
         for contra in contradictions:
-            for x, y in contra.cellsInvolved:
-                self.sudokuCells[x][y].redraw(contradiction=True)
+            cellsWithContradictions.update(contra.cellsInvolved)
+
+        for i in range(9):
+            for j in range(9):
+                hasContra = (i, j) in cellsWithContradictions
+                self.sudokuCells[i][j].markContradiction(hasContra)
 
 
 class SudokuCell(ctk.CTkFrame):
@@ -62,7 +75,7 @@ class SudokuCell(ctk.CTkFrame):
         self.canvas = tk.Canvas(self, width=self.size, height=self.size)
         self.canvas.pack()
 
-    def redraw(self, cell: Cell | None = None, contradiction: bool = False):
+    def redraw(self, cell: Cell | None = None):
         if cell is not None:
             self.cell = cell
 
@@ -80,6 +93,7 @@ class SudokuCell(ctk.CTkFrame):
 
                 self.canvas.create_text((col + 0.5) * (self.size / 3), (row + 0.5) * (self.size / 3), font=SudokuCell.candidateFont, text=candidate, tags="candidate", fill="#444444")
 
+    def markContradiction(self, contradiction: bool):
         if contradiction:
             self.canvas.configure(bg="#ff0000")
         else:
