@@ -51,10 +51,22 @@ class CandidateChangeMove(Move):
         self.wasAdded = wasAdded
 
     def apply(self, board: BoardState):
-        raise NotImplementedError
+        cell = board.getCell(self.row, self.col)
+
+        if cell.isEditable() and cell.getValue() is None:
+            if self.wasAdded:
+                cell.addCandidate(self.candidateNumber)
+            else:
+                cell.removeCandidate(self.candidateNumber)
 
     def undo(self, board: BoardState):
-        raise NotImplementedError
+        cell = board.getCell(self.row, self.col)
+        
+        if cell.isEditable() and cell.getValue() is None:
+            if self.wasAdded:
+                cell.removeCandidate(self.candidateNumber)
+            else:
+                cell.addCandidate(self.candidateNumber)
 
     def __str__(self) -> str:
         return f"CandidateChangeMove({self.row}, {self.col}, {self.candidateNumber}, {self.wasAdded})"
