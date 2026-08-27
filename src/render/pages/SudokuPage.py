@@ -5,6 +5,7 @@ import customtkinter as ctk
 from src.analysis import BoardUtils
 from src.analysis.Technique import Technique
 from src.core.Move import Move, ValueChangeMove, CandidateChangeMove, EliminationChangeMove
+from src.core.Game import Game
 from src.render.components.SudokuGrid import SudokuGrid
 from tests.test_board_state import createRandomBoardState
 
@@ -22,19 +23,29 @@ class SudokuPage(ctk.CTkFrame):
         self.mainMenuButton.place(relx=0.01, rely=0.05, anchor="w")
 
         self.boardState = BoardUtils.copyAndPopulateCandidates(createRandomBoardState(64))
-        self.sudokuGrid = SudokuGrid(self, self.boardState)
-        self.sudokuGrid.place(relx=0.02, rely=0.1, anchor="nw")
+        self.game = Game(self.boardState)
+
+        self.sudokuGrid = SudokuGrid(self, self.game.boardState)
+        self.sudokuGrid.place(relx=0.01, rely=0.1, anchor="nw")
 
         self.buttons = []
         self.buttonsContainer = ctk.CTkFrame(self)
         for i in range(1, 10):
             button = ctk.CTkButton(self.buttonsContainer, width=32, height=32,  text=str(i), command=lambda i=i: self.updateSelectedCellValue(i))
-            button.grid(row=0, column=i - 1)
+            button.grid(row=0, column=i - 1, padx=(0 if i == 1 else 2, 2))
             self.buttons.append(button)
 
-        self.undoButton = ctk.CTkButton(self.buttonsContainer, width=32, height=32, text=" ", command=lambda: self.updateSelectedCellValue(None))
-        self.undoButton.grid(row=0, column=len(self.buttons))
+        self.removeValueButton = ctk.CTkButton(self.buttonsContainer, width=32, height=32, text=" ", command=lambda: self.updateSelectedCellValue(None))
+        self.removeValueButton.grid(row=0, column=len(self.buttons), padx=(2,0))
+        self.buttons.append(self.removeValueButton)
+
+        self.undoButton = ctk.CTkButton(self.buttonsContainer, width=32, height=32, text="Undo", command=self.__undo)
+        self.undoButton.grid(row=0, column=len(self.buttons), padx=(10, 2))
         self.buttons.append(self.undoButton)
+
+        self.redoButton = ctk.CTkButton(self.buttonsContainer, width=32, height=32, text="Redo", command=self.__redo)
+        self.redoButton.grid(row=0, column=len(self.buttons), padx=(2, 0))
+        self.buttons.append(self.redoButton)
 
         self.editingState = 0
         self.editingStateButton = ctk.CTkButton(self.buttonsContainer, width=64, height=32, text="Editing: Cell values", command=self.incrementEditingState, fg_color="#2e8f01")
@@ -57,7 +68,7 @@ class SudokuPage(ctk.CTkFrame):
         if row is None or col is None:
             return
         
-        cell = self.boardState.getCell(row, col)
+        cell = self.game.boardState.getCell(row, col)
         move: Move | None = None
         match self.editingState:
             case 0: # Value editing
@@ -79,13 +90,30 @@ class SudokuPage(ctk.CTkFrame):
                     move = EliminationChangeMove(row, col, n, wasAdded)
                 
         if move is not None:
-            move.apply(self.boardState)
-            self.sudokuGrid.redrawCell(row, col)
+            self.game.makeMove(move)
+            self.sudokuGrid.redrawCell(row, col) # Less heavy method than using grid.redraw()
 
     def handleKeyPress(self, event):
+        shiftPressed = event.state & 0x1
+        controlPressed = event.state & 0x4
+
         if event.char in "123456789" and len(event.char) == 1: 
             try:
                 value = int(event.char)
                 self.updateSelectedCellValue(value)
             except ValueError as e:
                 pass
+
+        elif controlPressed and event.keysym.lower() == "z":
+            if shiftPressed:
+                self.__redo()
+            else:
+                self.__undo()
+
+    def __undo(self):
+        self.game.undoLastMove()
+        self.sudokuGrid.redraw() # Heavier method since the selected cell may not be the cell affected.
+
+    def __redo(self):
+        self.game.redoLastMove()
+        self.sudokuGrid.redraw()
