@@ -1,11 +1,8 @@
 from typing import Tuple
+from src.render.pages.MainMenuPage import MainMenuPage
+from src.render.pages.SudokuPage import SudokuPage
 
 import customtkinter as ctk
-
-from src.analysis import BoardUtils
-from src.core.BoardState import BoardState
-from src.render.SudokuGrid import SudokuGrid
-from tests.test_board_state import createRandomBoardState
 
 class App(ctk.CTk):
     def __init__(self, fg_color: str | Tuple[str, str] | None = None, **kwargs):
@@ -14,6 +11,13 @@ class App(ctk.CTk):
         self.title("Sudoku Trainer")
         self.geometry("1280x720")
 
-        self.boardState = BoardUtils.copyAndPopulateCandidates(createRandomBoardState(64))
-        self.sudokuGrid = SudokuGrid(self, self.boardState)
-        self.sudokuGrid.place(relx=0.01, rely=0.5, anchor="w")
+        self.page: ctk.CTkFrame | None = None
+
+        self.__setPage(SudokuPage(self))
+
+    def __setPage(self, page: ctk.CTkFrame):
+        if self.page is not None:
+            self.page.destroy()
+
+        self.page = page
+        self.page.pack(fill="both", expand=True)
