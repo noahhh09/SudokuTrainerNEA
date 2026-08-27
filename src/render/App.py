@@ -36,7 +36,8 @@ class App(ctk.CTk):
     def newPuzzle(self):
         self.__setPage(
             SudokuPage(
-                self
+                self,
+                mainMenuCommand=self.mainMenu
             )
         )
 
