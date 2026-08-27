@@ -70,3 +70,30 @@ class CandidateChangeMove(Move):
 
     def __str__(self) -> str:
         return f"CandidateChangeMove({self.row}, {self.col}, {self.candidateNumber}, {self.wasAdded})"
+
+class EliminationChangeMove(Move):
+    def __init__(self, row: int, col: int, candidateNumber: int, wasAdded: bool) -> None:
+        super().__init__(row, col)
+        self.candidateNumber = candidateNumber
+        self.wasAdded = wasAdded
+
+    def apply(self, board: BoardState):
+        cell = board.getCell(self.row, self.col)
+
+        if cell.isEditable() and cell.getValue() is None:
+            if self.wasAdded:
+                cell.eliminateCandidate(self.candidateNumber)
+            else:
+                cell.uneliminateCandidate(self.candidateNumber)
+
+    def undo(self, board: BoardState):
+        cell = board.getCell(self.row, self.col)
+        
+        if cell.isEditable() and cell.getValue() is None:
+            if self.wasAdded:
+                cell.uneliminateCandidate(self.candidateNumber)
+            else:
+                cell.eliminateCandidate(self.candidateNumber)
+
+    def __str__(self) -> str:
+        return f"EliminationChangeMove({self.row}, {self.col}, {self.candidateNumber}, {self.wasAdded})"

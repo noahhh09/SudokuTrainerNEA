@@ -113,8 +113,6 @@ class SudokuCell(ctk.CTkFrame):
 
                 self.canvas.create_text((col + 0.5) * (self.size / 3), (row + 0.5) * (self.size / 3), font=SudokuCell.eliminatedCandidateFont, text=candidate, tags="candidate", fill="#ff0000")
                 
-
-
     def markContradiction(self, contradiction: bool):
         if contradiction:
             self.canvas.configure(bg="#ff0000")
