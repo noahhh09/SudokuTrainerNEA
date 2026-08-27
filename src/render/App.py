@@ -1,6 +1,7 @@
 from typing import Tuple
 from src.render.pages.MainMenuPage import MainMenuPage
 from src.render.pages.SudokuPage import SudokuPage
+from src.render.pages.TechniquesLibraryPage import TechniquesLibraryPage
 
 import customtkinter as ctk
 
@@ -13,7 +14,7 @@ class App(ctk.CTk):
 
         self.page: ctk.CTkFrame | None = None
 
-        self.__setPage(SudokuPage(self))
+        self.mainMenu()
 
     def __setPage(self, page: ctk.CTkFrame):
         if self.page is not None:
@@ -21,3 +22,31 @@ class App(ctk.CTk):
 
         self.page = page
         self.page.pack(fill="both", expand=True)
+
+    def mainMenu(self):
+        self.__setPage(
+            MainMenuPage(
+                self,
+                newPuzzleCommand=self.newPuzzle,
+                techniquesPageCommand=self.techniquesPage,
+                accountsPageCommand=self.accountsPage
+            )
+        )
+
+    def newPuzzle(self):
+        self.__setPage(
+            SudokuPage(
+                self
+            )
+        )
+
+    def techniquesPage(self):
+        self.__setPage(
+            TechniquesLibraryPage(
+                self,
+                mainMenuCommand=self.mainMenu
+            )
+        )
+
+    def accountsPage(self):
+        pass

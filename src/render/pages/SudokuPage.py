@@ -4,7 +4,7 @@ import customtkinter as ctk
 
 from src.analysis import BoardUtils
 from src.core.BoardState import BoardState
-from src.render.SudokuGrid import SudokuGrid
+from src.render.components.SudokuGrid import SudokuGrid
 from tests.test_board_state import createRandomBoardState
 
 class SudokuPage(ctk.CTkFrame):
