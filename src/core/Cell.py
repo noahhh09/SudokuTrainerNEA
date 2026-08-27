@@ -1,12 +1,17 @@
 class Cell:
-    def __init__(self, value: int | None = None, editable: bool = False, candidates: set[int] | None = None):
+    def __init__(self, value: int | None = None, editable: bool = False, candidates: set[int] | None = None, eliminatedCandidates: set[int] | None = None):
         self.__value = value
         self.__editable = editable
 
         if candidates is None:
-            self.__candidates = set()
+            self.__candidates: set[int] = set()
         else:
             self.__candidates = candidates.copy()
+
+        if eliminatedCandidates is None:
+            self.__eliminatedCandidates = set()
+        else:
+            self.__eliminatedCandidates = eliminatedCandidates.copy()
 
     def setValue(self, value: int | None):
         if not self.__editable:
@@ -32,7 +37,7 @@ class Cell:
             raise Exception("Cell is not editable.")
 
         if not 1 <= value <= 9:
-            raise ValueError("Value must be between 1 and 9 inclusive.")
+            raise ValueError("Candidate value must be between 1 and 9 inclusive.")
 
         self.__candidates.add(value)
 
@@ -50,4 +55,23 @@ class Cell:
         self.__candidates.remove(value)
 
     def getCandidates(self) -> set[int]:
-        return self.__candidates
+        return self.__candidates.copy()
+
+    def eliminateCandidate(self, value: int):
+        if not self.__editable:
+            raise Exception("Cell is not editable.")
+
+        if not 1 <= value <= 9:
+            raise ValueError("Eliminated candidate value must be between 1 and 9 inclusive")
+
+        self.__eliminatedCandidates.add(value)
+
+    def uneliminateCandidate(self, value: int):
+        self.__eliminatedCandidates.remove(value)
+
+    def getEliminatedCandidates(self) -> set[int]:
+        return self.__eliminatedCandidates.copy()
+
+    def getEffectiveCandidates(self) -> set[int]:
+        # Returns candidates ∩ (eliminated)'
+        return set([candidate for candidate in self.__candidates if candidate not in self.__eliminatedCandidates])

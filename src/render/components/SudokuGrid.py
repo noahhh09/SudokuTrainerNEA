@@ -61,6 +61,7 @@ class SudokuGrid(ctk.CTkFrame):
 class SudokuCell(ctk.CTkFrame):
     valueFont = None
     candidateFont = None
+    eliminatedCandidateFont = None
 
     def __init__(self, master: Any, row: int, col: int, cell: Cell, onSelectCallback, size=64, **kwargs):
         super().__init__(master, width=size, height=size, **kwargs)
@@ -75,6 +76,7 @@ class SudokuCell(ctk.CTkFrame):
         if SudokuCell.valueFont is None or SudokuCell.candidateFont is None:
             SudokuCell.valueFont = ctk.CTkFont(size=self.size // 3 + 8, weight='bold')
             SudokuCell.candidateFont = ctk.CTkFont(size=self.size // 8 + 4)
+            SudokuCell.eliminatedCandidateFont = ctk.CTkFont(size=self.size // 8 + 4, overstrike=True)
 
         self.pack_propagate(False)
 
@@ -92,17 +94,26 @@ class SudokuCell(ctk.CTkFrame):
 
         assert SudokuCell.valueFont
         assert SudokuCell.candidateFont
+        assert SudokuCell.eliminatedCandidateFont
 
         self.canvas.delete("all")
 
         if self.cell.getValue() is not None:
             self.canvas.create_text(self.size // 2, self.size // 2, text=str(self.cell.getValue()), font=SudokuCell.valueFont, tags="value")
         else:
-            for candidate in self.cell.getCandidates():
+            for candidate in self.cell.getEffectiveCandidates():
                 row = (candidate - 1) // 3
                 col = (candidate - 1) % 3
 
                 self.canvas.create_text((col + 0.5) * (self.size / 3), (row + 0.5) * (self.size / 3), font=SudokuCell.candidateFont, text=candidate, tags="candidate", fill="#444444")
+
+            for candidate in self.cell.getEliminatedCandidates():
+                row = (candidate - 1) // 3
+                col = (candidate - 1) % 3
+
+                self.canvas.create_text((col + 0.5) * (self.size / 3), (row + 0.5) * (self.size / 3), font=SudokuCell.eliminatedCandidateFont, text=candidate, tags="candidate", fill="#ff0000")
+                
+
 
     def markContradiction(self, contradiction: bool):
         if contradiction:

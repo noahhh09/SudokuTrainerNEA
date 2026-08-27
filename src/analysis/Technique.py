@@ -38,7 +38,7 @@ class NakedSingle(Technique):
 
         for i in range(9):
             for j in range(9):
-                candidates = candidateState.getCell(i, j).getCandidates()
+                candidates = candidateState.getCell(i, j).getEffectiveCandidates()
                 if len(candidates) == 1:
                     found.append(NakedSingle([ValueChangeMove(i, j, None, list(candidates)[0])]))
 
@@ -91,7 +91,7 @@ class HiddenSingle(Technique):
             position = None
 
             for i in range(9):
-                candidates = unit[i].getCandidates()
+                candidates = unit[i].getEffectiveCandidates()
                 if digit in candidates:
                     if position is None:
                         position = i
@@ -99,7 +99,7 @@ class HiddenSingle(Technique):
                         position = None
                         break # Since this means it's repeated..
 
-            if position is not None and len(unit[position].getCandidates()) > 1: # Avoids naked single detection.
+            if position is not None and len(unit[position].getEffectiveCandidates()) > 1: # Avoids naked single detection.
                 singleOccurences[digit] = position
 
         return singleOccurences

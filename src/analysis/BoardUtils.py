@@ -2,7 +2,7 @@ from ..core.BoardState import BoardState
 
 
 def copyAndPopulateCandidates(board: BoardState) -> BoardState:
-    board = BoardState.deserialise(board.serialise())
+    board = BoardState.deserialise(board.serialise()) # Generates a copy of the same board without candidates
     
     # 1. Iterate through each cell, and add its value, if applicable, to its respective row, col, and block's "contents"
     # 2. Filter down the list of all possible values (1 through 9) from each row/col/block, based on its contents. Essentially NOTing 1-9 with the contents above
