@@ -6,6 +6,9 @@ from ..core.BoardState import BoardState
 
 
 class Technique:
+    displayName: str = ""
+    description: str = ""
+
     def __init__(self, moves: list[Move]) -> None:
         self.moves = moves
 
@@ -21,6 +24,9 @@ class Technique:
 
 
 class NakedSingle(Technique):
+    displayName = "Naked Single"
+    description = "A simple technique where a cell has only one candidate remaining."
+
     def __init__(self, moves: list[Move]) -> None:
         super().__init__(moves)
 
@@ -40,6 +46,9 @@ class NakedSingle(Technique):
 
 
 class HiddenSingle(Technique):
+    displayName = "Hidden Single"
+    description = "A simple technique where a candidate only appears in one cell."
+
     def __init__(self, moves: list[Move]) -> None:
         super().__init__(moves)
 
