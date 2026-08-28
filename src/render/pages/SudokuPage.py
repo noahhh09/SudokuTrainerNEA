@@ -1,9 +1,12 @@
+import sqlite3
 from typing import Any
 
 import customtkinter as ctk
+import pandas as pd
 
 from src.analysis import BoardUtils
 from src.analysis.Technique import Technique
+from src.core.BoardState import BoardState
 from src.core.Move import Move, ValueChangeMove, CandidateChangeMove, EliminationChangeMove
 from src.core.Game import Game
 from src.render.components.SudokuGrid import SudokuGrid
@@ -16,13 +19,13 @@ EDITING_STATES = {
 }
 
 class SudokuPage(ctk.CTkFrame):
-    def __init__(self, master: Any, mainMenuCommand, **kwargs):
+    def __init__(self, master: Any, boardState: BoardState, mainMenuCommand, **kwargs):
         super().__init__(master, **kwargs)
 
         self.mainMenuButton = ctk.CTkButton(self, text="Back to Main Menu", width=200, height=50, command=mainMenuCommand)
         self.mainMenuButton.place(relx=0.01, rely=0.05, anchor="w")
 
-        self.boardState = BoardUtils.copyAndPopulateCandidates(createRandomBoardState(64))
+        self.boardState = boardState
         self.game = Game(self.boardState)
 
         self.sudokuGrid = SudokuGrid(self, self.game.boardState)

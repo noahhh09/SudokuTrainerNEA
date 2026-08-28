@@ -1,4 +1,5 @@
 from typing import Tuple
+from src.core.BoardState import BoardState
 from src.render.pages.MainMenuPage import MainMenuPage
 from src.render.pages.SudokuPage import SudokuPage
 from src.render.pages.TechniquesLibraryPage import TechniquesLibraryPage
@@ -27,7 +28,7 @@ class App(ctk.CTk):
         self.__setPage(
             MainMenuPage(
                 self,
-                newPuzzleCommand=self.newPuzzle,
+                loadBoardStateCommand=self.loadBoardStatePuzzle,
                 techniquesPageCommand=self.techniquesPage,
                 accountsPageCommand=self.accountsPage
             )
@@ -37,6 +38,16 @@ class App(ctk.CTk):
         self.__setPage(
             SudokuPage(
                 self,
+                BoardState.deserialise("1fx25fx13f7fx2/6fx13fx28fx19fx1/x59f8fx2/x11fx7/8f7f6f1fx5/x56fx3/x87f/x18fx19fx17f6fx14f/7fx36fx13f1f2f"),
+                mainMenuCommand=self.mainMenu
+            )
+        )
+
+    def loadBoardStatePuzzle(self, boardState: BoardState):
+        self.__setPage(
+            SudokuPage(
+                self,
+                boardState,
                 mainMenuCommand=self.mainMenu
             )
         )
@@ -45,7 +56,8 @@ class App(ctk.CTk):
         self.__setPage(
             TechniquesLibraryPage(
                 self,
-                mainMenuCommand=self.mainMenu
+                mainMenuCommand=self.mainMenu,
+                loadBoardStateCommand=self.loadBoardStatePuzzle
             )
         )
 

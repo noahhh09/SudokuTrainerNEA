@@ -4,7 +4,7 @@
 
 # Applying tags takes quite a while. Approx 30 seconds per 25,000 tags with Naked + Hidden singles.
 # Set to -1 to load all from dataset.
-LOAD_MAX = -1
+LOAD_MAX = 100000
 # Tagging takes ages.
 NUM_TAGGED = 100000
 
