@@ -1,6 +1,5 @@
 from typing import Tuple
 from src.analysis import BoardUtils
-from src.analysis.Technique import HiddenSingle
 from src.core.BoardState import BoardState
 from src.render.pages.MainMenuPage import MainMenuPage
 from src.render.pages.SudokuPage import SudokuPage

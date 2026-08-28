@@ -1,4 +1,4 @@
-from src.analysis.Technique import HiddenSingle
+from src.analysis.techniques.HiddenSingle import HiddenSingle
 from src.core.BoardState import BoardState
 
 

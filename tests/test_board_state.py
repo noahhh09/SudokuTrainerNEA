@@ -1,5 +1,4 @@
-from src.analysis import BoardUtils
-from src.analysis.Technique import NakedSingle
+from src.analysis.techniques.NakedSingle import NakedSingle
 from src.core.BoardState import BoardState
 from src.core.Cell import Cell
 import random

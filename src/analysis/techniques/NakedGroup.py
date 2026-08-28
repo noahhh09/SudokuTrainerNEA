@@ -2,9 +2,8 @@ import itertools
 
 from src.analysis import BoardUtils
 from src.analysis.Technique import Technique
-from src.analysis.Unit import Unit, UnitType
+from src.analysis.Unit import Unit
 from src.core.BoardState import BoardState
-from src.core.Cell import Cell
 from src.core.Move import EliminationChangeMove, Move
 
 
@@ -86,6 +85,7 @@ class NakedTriple(Technique):
 
         return found
 
+    # Used for debugging.
     def __str__(self) -> str:
         return f"{self.__class__.__name__}({self.unit.unitType.name} {self.unit.unitIndex}, {self.moves})"
 

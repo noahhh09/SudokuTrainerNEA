@@ -1,16 +1,11 @@
-import sqlite3
 from typing import Any
 
 import customtkinter as ctk
-import pandas as pd
 
-from src.analysis import BoardUtils
-from src.analysis.Technique import Technique
 from src.core.BoardState import BoardState
 from src.core.Move import Move, ValueChangeMove, CandidateChangeMove, EliminationChangeMove
 from src.core.Game import Game
 from src.render.components.SudokuGrid import SudokuGrid
-from tests.test_board_state import createRandomBoardState
 
 EDITING_STATES = {
     0: "Cell values",

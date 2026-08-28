@@ -1,4 +1,4 @@
-from typing import Any, Callable
+from typing import Any
 
 import customtkinter as ctk
 import tkinter as tk
