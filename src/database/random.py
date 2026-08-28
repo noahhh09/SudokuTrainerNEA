@@ -1,14 +1,21 @@
 import pandas as pd
 import sqlite3
 
+from src.analysis.techniques.NakedGroup import NakedTriple
+from src.core.BoardState import BoardState
+
 conn = sqlite3.connect("sudoku.db")
 
 df = pd.read_sql_query("""
-    SELECT P.SerialisedBoard, P.Difficulty, PT.Tag
+    SELECT P.PuzzleID, P.SerialisedBoard, P.Difficulty, PT.Tag
     FROM Puzzles P
     INNER JOIN PuzzleTags PT
         ON PT.PuzzleID = P.PuzzleID
     GROUP BY P.PuzzleID
-    ORDER BY P.Difficulty DESC
+    HAVING COUNT(*) = 1
+        AND MAX(PT.Tag) = 'NakedTriple'
 """, conn)
-print(df.head(10))
+print(df["SerialisedBoard"].iloc[0])
+
+board = BoardState.deserialise(df["SerialisedBoard"].iloc[0])
+print(NakedTriple.findAvailable(board))
