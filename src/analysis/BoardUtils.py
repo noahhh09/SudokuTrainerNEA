@@ -1,3 +1,5 @@
+from src.analysis.Unit import Unit, UnitType
+
 from ..core.BoardState import BoardState
 
 
@@ -48,3 +50,17 @@ def copyAndPopulateCandidates(board: BoardState) -> BoardState:
             board.getCell(i, j).addCandidates(intersection)
 
     return board
+
+def getAllUnits(board: BoardState) -> list[Unit]:
+    units: list[Unit] = []
+
+    for i in range(9):
+        units.append(Unit(UnitType.ROW, i, board.getRow(i)))
+
+    for j in range(9):
+        units.append(Unit(UnitType.COLUMN, j, board.getColumn(j)))
+
+    for k in range(9):
+        units.append(Unit(UnitType.BLOCK, k, board.getBlock(k)))
+
+    return units
