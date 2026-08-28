@@ -50,8 +50,8 @@ class HiddenSingle(Technique):
     displayName = "Hidden Single"
     description = "A simple technique where a candidate only appears in one cell."
 
-    def __init__(self, moves: list[Move], unitType: UnitType) -> None:
-        self.unitType = unitType
+    def __init__(self, moves: list[Move], unit: Unit) -> None:
+        self.unit = unit
         super().__init__(moves)
 
     @staticmethod
@@ -65,7 +65,7 @@ class HiddenSingle(Technique):
             hiddenSingles = HiddenSingle._findHiddenSinglesInUnit(unit)
             for digit, index in hiddenSingles.items():
                 row, col = unit.getBoardPosition(index)
-                tech = HiddenSingle([ValueChangeMove(row, col, None, digit)], unit.unitType)
+                tech = HiddenSingle([ValueChangeMove(row, col, None, digit)], unit)
                 found.append(tech)
 
         return found # Known "bug": might contain duplicates. Say if a block and a column share a hidden single. Whatever.
