@@ -2,6 +2,8 @@ from typing import Any
 
 import customtkinter as ctk
 
+from src.analysis import ALL_TECHNIQUES
+from src.analysis.techniques.NakedSingle import NakedSingle
 from src.core.BoardState import BoardState
 from src.core.Move import Move, ValueChangeMove, CandidateChangeMove, EliminationChangeMove
 from src.core.Game import Game
@@ -16,6 +18,11 @@ EDITING_STATES = {
 class SudokuPage(ctk.CTkFrame):
     def __init__(self, master: Any, boardState: BoardState, mainMenuCommand, **kwargs):
         super().__init__(master, **kwargs)
+
+        for tech in ALL_TECHNIQUES:
+            print(tech.findAvailable(boardState))
+            print("")
+
 
         self.mainMenuButton = ctk.CTkButton(self, text="Back to Main Menu", width=200, height=50, command=mainMenuCommand)
         self.mainMenuButton.place(relx=0.01, rely=0.05, anchor="w")

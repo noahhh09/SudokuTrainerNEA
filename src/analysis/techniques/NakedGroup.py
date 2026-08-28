@@ -11,9 +11,11 @@ class NakedPair(Technique):
     displayName = "Naked Pair"
     description = "A technique where two cells exclusively have the same two candidates remaining."
 
-    def __init__(self, moves: list[Move], unit: Unit):
+    def __init__(self, moves: list[Move], unit: Unit, group: set[int], union: set[int]):
         super().__init__(moves)
         self.unit = unit
+        self.groupPositions = group
+        self.union = union
 
     @staticmethod
     def findAvailable(state: BoardState) -> list[Technique]:
@@ -41,18 +43,24 @@ class NakedPair(Technique):
                             moves.append(elim)
 
                 if len(moves) != 0:
-                    tech = NakedPair(moves, unit)
+                    tech = NakedPair(moves, unit, set(positions), union)
                     found.append(tech)
 
         return found
+
+    # Used for debugging.
+    def __str__(self) -> str:
+        return f"{self.__class__.__name__}({self.unit.unitType.name} {self.unit.unitIndex} POSITIONS{self.groupPositions} UNION{self.union}, {self.moves})"
 
 class NakedTriple(Technique):
     displayName = "Naked Triple"
     description = "A technique where three cells contain only three mutual candidates between them, allowing candidates to be ruled out in other cells."
 
-    def __init__(self, moves: list[Move], unit: Unit):
+    def __init__(self, moves: list[Move], unit: Unit, group: set[int], union: set[int]):
         super().__init__(moves)
         self.unit = unit
+        self.groupPositions = group
+        self.union = union
 
     @staticmethod
     def findAvailable(state: BoardState) -> list[Technique]:
@@ -80,19 +88,20 @@ class NakedTriple(Technique):
                             moves.append(elim)
 
                 if len(moves) != 0:
-                    tech = NakedTriple(moves, unit)
+                    tech = NakedTriple(moves, unit, set(positions), union)
                     found.append(tech)
 
         return found
 
     # Used for debugging.
     def __str__(self) -> str:
-        return f"{self.__class__.__name__}({self.unit.unitType.name} {self.unit.unitIndex}, {self.moves})"
+        return f"{self.__class__.__name__}({self.unit.unitType.name} {self.unit.unitIndex} POSITIONS{self.groupPositions} UNION{self.union}, {self.moves})"
 
 # Returns [(relPositions, candidateValues)]
 # TODO - Remove lower degree naked groups from this set.
 def _findNakedGroups(unit: Unit, size: int) -> list[tuple[list[int], set[int]]]:
     cells = list(enumerate(unit.cells))
+    cells = [(i, cell) for i, cell in cells if 1 < len(cell.getEffectiveCandidates()) <= size] # Prematurely removes naked singles and cells that won't contribute to a naked pair.
     
     cellCombinations = itertools.combinations(cells, size)
     foundGroups = []
@@ -100,14 +109,25 @@ def _findNakedGroups(unit: Unit, size: int) -> list[tuple[list[int], set[int]]]:
     for combo in cellCombinations:
         union: set[int] = set()
         for _, cell in combo:
-            if len(cell.getEffectiveCandidates()) != 0:
-                union.update(cell.getEffectiveCandidates())
+            union.update(cell.getEffectiveCandidates())
 
         if len(union) == size:
             legal = True
-            for _, cell in combo:
-                if legal:
-                    legal = 1 < len(cell.getEffectiveCandidates()) <= size
+
+            # Determine if there are any naked subset groups.
+            for n in range(2, size):
+                # Iterate through all combinations of size n inside the combo
+                for subset in itertools.combinations(combo, n):
+                    subsetUnion: set[int] = set()
+                    for _, subCell in subset:
+                        subsetUnion.update(subCell.getEffectiveCandidates())
+                    
+                    if len(subsetUnion) == n:
+                        legal = False
+                        break
+
+                if not legal:
+                    break
 
             if not legal:
                 continue
