@@ -89,7 +89,7 @@ class SudokuPage(ctk.CTkFrame):
 
             case 2: # Candidate elimination
                 if n is not None:
-                    wasAdded = n not in cell.getCandidates()
+                    wasAdded = n not in cell.getEliminatedCandidates()
                     move = EliminationChangeMove(row, col, n, wasAdded)
                 
         if move is not None:
