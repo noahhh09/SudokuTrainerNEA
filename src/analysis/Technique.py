@@ -92,5 +92,3 @@ class HiddenSingle(Technique):
                 singleOccurences[digit] = position
 
         return singleOccurences
-
-ALL_TECHNIQUES: list[type[Technique]] = [NakedSingle, HiddenSingle]

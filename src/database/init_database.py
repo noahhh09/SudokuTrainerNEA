@@ -14,7 +14,7 @@ from pathlib import Path
 import pandas as pd
 import sqlite3
 
-from src.analysis.Technique import ALL_TECHNIQUES
+from src.analysis import ALL_TECHNIQUES
 from src.core.BoardState import BoardState
 
 global n

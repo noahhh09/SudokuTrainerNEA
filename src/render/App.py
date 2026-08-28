@@ -1,4 +1,6 @@
 from typing import Tuple
+from src.analysis import BoardUtils
+from src.analysis.Technique import HiddenSingle
 from src.core.BoardState import BoardState
 from src.render.pages.MainMenuPage import MainMenuPage
 from src.render.pages.SudokuPage import SudokuPage
@@ -44,6 +46,8 @@ class App(ctk.CTk):
         )
 
     def loadBoardStatePuzzle(self, boardState: BoardState):
+        boardState = BoardUtils.copyAndPopulateCandidates(boardState)
+
         self.__setPage(
             SudokuPage(
                 self,
@@ -51,7 +55,7 @@ class App(ctk.CTk):
                 mainMenuCommand=self.mainMenu
             )
         )
-
+        
     def techniquesPage(self):
         self.__setPage(
             TechniquesLibraryPage(

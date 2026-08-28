@@ -3,7 +3,8 @@ import sqlite3
 import customtkinter as ctk
 import pandas as pd
 
-from src.analysis.Technique import ALL_TECHNIQUES, Technique
+from src.analysis import ALL_TECHNIQUES
+from src.analysis.Technique import Technique
 from src.core.BoardState import BoardState
 
 class TechniquesLibraryPage(ctk.CTkFrame):
