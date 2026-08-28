@@ -1,3 +1,5 @@
+from src.analysis.Unit import Unit, UnitType
+
 from . import BoardUtils
 
 from ..core.Cell import Cell
@@ -48,34 +50,22 @@ class HiddenSingle(Technique):
     displayName = "Hidden Single"
     description = "A simple technique where a candidate only appears in one cell."
 
-    def __init__(self, moves: list[Move]) -> None:
+    def __init__(self, moves: list[Move], unitType: UnitType) -> None:
+        self.unitType = unitType
         super().__init__(moves)
 
     @staticmethod
     def findAvailable(state: BoardState) -> list[Technique]:
-        candidateState = BoardUtils.copyAndPopulateCandidates(state)
         found: list[Technique] = []
 
-        for i in range(9):
-            unit = candidateState.getRow(i)
-            hiddenSingles = HiddenSingle._findHiddenSinglesInUnit(unit)
-            for digit, col in hiddenSingles.items():
-                tech = HiddenSingle([ValueChangeMove(i, col, None, digit)])
-                found.append(tech)
+        candidateState = BoardUtils.copyAndPopulateCandidates(state)
+        units = BoardUtils.getAllUnits(candidateState)
 
-        for j in range(9):
-            unit = candidateState.getColumn(j)
-            hiddenSingles = HiddenSingle._findHiddenSinglesInUnit(unit)
-            for digit, row in hiddenSingles.items():
-                tech = HiddenSingle([ValueChangeMove(row, j, None, digit)])
-                found.append(tech)
-
-        for k in range(9):
-            unit = candidateState.getBlock(k)
+        for unit in units:
             hiddenSingles = HiddenSingle._findHiddenSinglesInUnit(unit)
             for digit, index in hiddenSingles.items():
-                row, col = candidateState.getPositionInBlock(k, index)
-                tech = HiddenSingle([ValueChangeMove(row, col, None, digit)])
+                row, col = unit.getBoardPosition(index)
+                tech = HiddenSingle([ValueChangeMove(row, col, None, digit)], unit.unitType)
                 found.append(tech)
 
         return found # Known "bug": might contain duplicates. Say if a block and a column share a hidden single. Whatever.
@@ -83,14 +73,14 @@ class HiddenSingle(Technique):
     # Returns the RELATIVE POSITIONS of single occurrences of a candidate DIGIT in a unit.
     # Dict: [digit, position]
     @staticmethod
-    def _findHiddenSinglesInUnit(unit: list[Cell]) -> dict[int, int]:
+    def _findHiddenSinglesInUnit(unit: Unit) -> dict[int, int]:
         singleOccurences: dict[int, int] = {}
 
         for digit in range(1, 10):
             position = None
 
             for i in range(9):
-                candidates = unit[i].getEffectiveCandidates()
+                candidates = unit.cells[i].getEffectiveCandidates()
                 if digit in candidates:
                     if position is None:
                         position = i
@@ -98,7 +88,7 @@ class HiddenSingle(Technique):
                         position = None
                         break # Since this means it's repeated..
 
-            if position is not None and len(unit[position].getEffectiveCandidates()) > 1: # Avoids naked single detection.
+            if position is not None and len(unit.cells[position].getEffectiveCandidates()) > 1: # Avoids naked single detection.
                 singleOccurences[digit] = position
 
         return singleOccurences
