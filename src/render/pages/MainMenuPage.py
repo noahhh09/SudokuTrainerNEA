@@ -36,5 +36,9 @@ class MainMenuPage(ctk.CTkFrame):
         LIMIT 1
 """, conn)
 
+        if df.empty:
+            print("No puzzles found")
+            return
+
         bs = BoardState.deserialise(df.iloc[0]["SerialisedBoard"])
         self.loadBoardStateCommand(bs)

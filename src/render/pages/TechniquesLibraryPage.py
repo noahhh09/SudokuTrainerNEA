@@ -54,6 +54,10 @@ class TechniqueWidget(ctk.CTkFrame):
         LIMIT 1
 """, conn, params=(self.technique.__name__,))
 
+        if df.empty:
+            print("No puzzles found matching constraints")
+            return
+        
         # TODO - Check - for now get 1st element
         bs = BoardState.deserialise(df.iloc[0]["SerialisedBoard"])
         self.loadBoardStateCommand(bs)
