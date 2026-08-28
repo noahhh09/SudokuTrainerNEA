@@ -60,7 +60,7 @@ def applyTags(row):
     tags = []
 
     for technique in techniques:
-        if len(technique.findAvailable(boardState,findFirstOnly=False)) >= 1:
+        if len(technique.findAvailable(boardState)) >= 1:
             tags.append(technique.__name__)
 
     global n
