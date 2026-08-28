@@ -90,6 +90,7 @@ class NakedTriple(Technique):
         return f"{self.__class__.__name__}({self.unit.unitType.name} {self.unit.unitIndex}, {self.moves})"
 
 # Returns [(relPositions, candidateValues)]
+# TODO - Remove lower degree naked groups from this set.
 def _findNakedGroups(unit: Unit, size: int) -> list[tuple[list[int], set[int]]]:
     cells = list(enumerate(unit.cells))
     

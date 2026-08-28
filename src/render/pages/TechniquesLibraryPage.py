@@ -42,6 +42,18 @@ class TechniqueWidget(ctk.CTkFrame):
         self.practiceButton = ctk.CTkButton(self, text="Practice", command=self.practiceTechnique)
         self.practiceButton.place(relx=0.5, rely=0.9, anchor="center")
 
+        conn = sqlite3.connect("sudoku.db")
+        df = pd.read_sql_query("""
+            SELECT COUNT(*) AS Count
+            FROM PuzzleTags
+            WHERE Tag = ?
+        """, conn, params=(self.technique.__name__, ))
+        conn.close()
+
+        self.countLabel = ctk.CTkLabel(self, text=f"{df["Count"].iloc[0]}", wraplength=168, font=ctk.CTkFont(size=10,slant="italic"))
+        self.countLabel.place(relx=0.5, rely=0.75, anchor="s")
+
+
     def practiceTechnique(self):
         conn = sqlite3.connect("sudoku.db")
         df = pd.read_sql_query("""
@@ -54,6 +66,7 @@ class TechniqueWidget(ctk.CTkFrame):
         ORDER BY RANDOM()
         LIMIT 1
 """, conn, params=(self.technique.__name__,))
+        conn.close()
 
         if df.empty:
             print("No puzzles found matching constraints")
