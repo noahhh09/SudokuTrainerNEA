@@ -4,7 +4,6 @@ from ..core.Cell import Cell
 from ..core.Move import Move, ValueChangeMove
 from ..core.BoardState import BoardState
 
-
 class Technique:
     displayName: str = ""
     description: str = ""
@@ -103,3 +102,5 @@ class HiddenSingle(Technique):
                 singleOccurences[digit] = position
 
         return singleOccurences
+
+ALL_TECHNIQUES: list[type[Technique]] = [NakedSingle, HiddenSingle]

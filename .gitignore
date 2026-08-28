@@ -24,3 +24,6 @@ dist/
 build/
 out/
 *.tsbuildinfo
+
+sudoku-3m.csv
+*.db

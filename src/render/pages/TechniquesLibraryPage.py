@@ -1,6 +1,6 @@
 import customtkinter as ctk
 
-from src.analysis.Technique import Technique, NakedSingle, HiddenSingle
+from src.analysis.Technique import ALL_TECHNIQUES, Technique
 
 class TechniquesLibraryPage(ctk.CTkFrame):
     def __init__(self, master, mainMenuCommand, **kwargs):
@@ -11,8 +11,7 @@ class TechniquesLibraryPage(ctk.CTkFrame):
 
         self.techniquesGrid = ctk.CTkScrollableFrame(self)
 
-        techniques: list[type[Technique]] = [NakedSingle, HiddenSingle]
-        for i, technique in enumerate(techniques):
+        for i, technique in enumerate(ALL_TECHNIQUES):
             widget = TechniqueWidget(self.techniquesGrid, technique=technique)
             widget.grid(column=i % 4, row=i // 4, padx=(0 if i % 4 == 0 else 5, 5), pady=(5, 5))
 
