@@ -99,7 +99,8 @@ class SudokuCell(ctk.CTkFrame):
         self.canvas.delete("all")
 
         if self.cell.getValue() is not None:
-            self.canvas.create_text(self.size // 2, self.size // 2, text=str(self.cell.getValue()), font=SudokuCell.valueFont, tags="value")
+            colour = "#000000" if not self.cell.isEditable() else "#1111ff" # O1.4. Non-editable cells should be clearly distinguishable from editable cells.
+            self.canvas.create_text(self.size // 2, self.size // 2, text=str(self.cell.getValue()), font=SudokuCell.valueFont, tags="value", fill=colour)
         else:
             for candidate in self.cell.getEffectiveCandidates():
                 row = (candidate - 1) // 3
