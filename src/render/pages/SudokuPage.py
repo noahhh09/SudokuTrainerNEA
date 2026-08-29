@@ -59,13 +59,13 @@ class SudokuPage(ctk.CTkFrame):
 
             case EditState.CANDIDATES:
                 if n is not None:
-                    wasAdded = n not in cell.getCandidates()
-                    move = CandidateChangeMove(row, col, n, wasAdded)
+                    add = n not in cell.getCandidates()
+                    move = CandidateChangeMove(row, col, n, add)
 
             case EditState.ELIMINATION:
                 if n is not None:
-                    wasAdded = n not in cell.getEliminatedCandidates()
-                    move = EliminationChangeMove(row, col, n, wasAdded)
+                    add = n not in cell.getEliminatedCandidates()
+                    move = EliminationChangeMove(row, col, n, add)
                 
         if move is not None:
             self.game.makeMove(move)
