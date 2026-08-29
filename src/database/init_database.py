@@ -79,11 +79,15 @@ def applyTags(row):
 path = Path(__file__).parent / "sudoku-3m.csv"
 
 print("Loading df...")
-df = pd.read_csv(path, usecols=["id", "puzzle", "clues", "difficulty"], nrows=(None if LOAD_MAX <= 0 else LOAD_MAX)).rename(columns={"id": "PuzzleID", "puzzle": "SerialisedBoard"})
+df = pd.read_csv(path, usecols=["id", "puzzle", "clues", "difficulty", "solution"], nrows=(None if LOAD_MAX <= 0 else LOAD_MAX)).rename(columns={"id": "PuzzleID", "puzzle": "SerialisedBoard"})
 print(f"Loaded {len(df.index)} dataframe rows. Converting puzzle strings...")
 df['SerialisedBoard'] = df['SerialisedBoard'].apply(lambda x:convertPuzzleString(x))
 print()
-print("Converted puzzle strings. Storing puzzles...")
+print("Converted puzzle strings. Converting solution strings...")
+n = 0
+df['solution'] = df['solution'].apply(lambda x:convertPuzzleString(str(x)))
+print()
+print("Converted solution strings. Storing puzzles...")
 
 conn = sqlite3.connect("sudoku.db")
 
