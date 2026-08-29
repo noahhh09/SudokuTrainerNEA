@@ -3,7 +3,7 @@ from src.analysis.Unit import Unit, UnitType
 from ..core.BoardState import BoardState
 
 
-def copyAndPopulateCandidates(board: BoardState) -> BoardState:
+def _copyAndPopulateCandidates(board: BoardState) -> BoardState:
     board = BoardState.deserialise(board.serialise()) # Generates a copy of the same board without candidates and eliminations
     
     # 1. Iterate through each cell, and add its value, if applicable, to its respective row, col, and block's "contents"
@@ -50,6 +50,17 @@ def copyAndPopulateCandidates(board: BoardState) -> BoardState:
             board.getCell(i, j).addCandidates(intersection)
 
     return board
+
+def copyAndPopulateCandidates(board: BoardState) -> BoardState:
+    newBoard = _copyAndPopulateCandidates(board)
+
+    for i in range(9):
+        for j in range(9):
+            originallyEliminated = board.getCell(i, j).getEliminatedCandidates()
+            newBoard.getCell(i, j).eliminateCandidates(originallyEliminated)
+
+    return newBoard
+
 
 def getAllUnits(board: BoardState) -> list[Unit]:
     units: list[Unit] = []

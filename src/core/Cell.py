@@ -66,6 +66,10 @@ class Cell:
 
         self.__eliminatedCandidates.add(value)
 
+    def eliminateCandidates(self, values: set[int]):
+        for value in values:
+            self.eliminateCandidate(value)
+
     def uneliminateCandidate(self, value: int):
         self.__eliminatedCandidates.remove(value)
 

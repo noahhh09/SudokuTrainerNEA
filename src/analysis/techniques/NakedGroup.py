@@ -64,7 +64,7 @@ class NakedTriple(Technique):
 
     @staticmethod
     def findAvailable(state: BoardState) -> list[Technique]:
-        candidatesState = BoardUtils.copyAndPopulateCandidates(state) # TODO: Change to preserve eliminations
+        candidatesState = BoardUtils.copyAndPopulateCandidates(state)
         units = BoardUtils.getAllUnits(candidatesState)
 
         found: list[Technique] = []
@@ -80,8 +80,8 @@ class NakedTriple(Technique):
             
                 for relPos in positionsToCheck:
                     candidatesToEliminate = unit.cells[relPos].getEffectiveCandidates().intersection(union)
-    
-                    if candidatesToEliminate:
+
+                    if len(candidatesToEliminate) > 0:
                         row, col = unit.getBoardPosition(relPos)
                         for n in candidatesToEliminate:
                             elim = EliminationChangeMove(row, col, n, True)
