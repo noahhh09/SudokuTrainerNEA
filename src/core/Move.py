@@ -22,23 +22,30 @@ class Move:
 
 
 class ValueChangeMove(Move):
-    def __init__(self, row: int, col: int, oldValue: int | None, newValue: int | None) -> None:
+    def __init__(self, row: int, col: int, newValue: int | None) -> None:
         super().__init__(row, col)
-        self.oldValue = oldValue
         self.newValue = newValue
+
+        self.oldValue: int | None = None
+        self.applied = False
 
     def apply(self, board: BoardState):
         cell = board.getCell(self.row, self.col)
 
-        # TODO - Might be worth checking if the value of the cell == oldValue?
         if cell.isEditable():
+            if not self.applied:
+                self.applied = True
+                self.oldValue = cell.getValue()
+
             cell.setValue(self.newValue)
 
     def undo(self, board: BoardState):
+        if not self.applied:
+            raise ValueError("The move has not been applied yet.")
+
         cell = board.getCell(self.row, self.col)
 
-        # TODO - Might be worth checking if the value of the cell == newValue?
-        if cell.isEditable():
+        if cell.isEditable() and cell.getValue() == self.newValue:
             cell.setValue(self.oldValue)
 
     def __str__(self) -> str:

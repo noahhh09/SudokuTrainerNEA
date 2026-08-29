@@ -21,6 +21,6 @@ class NakedSingle(Technique):
             for j in range(9):
                 candidates = candidateState.getCell(i, j).getEffectiveCandidates()
                 if len(candidates) == 1:
-                    found.append(NakedSingle([ValueChangeMove(i, j, None, list(candidates)[0])]))
+                    found.append(NakedSingle([ValueChangeMove(i, j, list(candidates)[0])]))
 
         return found

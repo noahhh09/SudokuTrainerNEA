@@ -52,12 +52,10 @@ class SudokuPage(ctk.CTkFrame):
 
         match editState:
             case EditState.CELL_VALUES:
-                oldValue = cell.getValue()
-
-                if oldValue == n:
+                if n == cell.getValue():
                     n = None
 
-                move = ValueChangeMove(row, col, oldValue, n)
+                move = ValueChangeMove(row, col, n)
 
             case EditState.CANDIDATES:
                 if n is not None:

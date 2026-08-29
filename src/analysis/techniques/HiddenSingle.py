@@ -24,7 +24,7 @@ class HiddenSingle(Technique):
             hiddenSingles = HiddenSingle._findHiddenSinglesInUnit(unit)
             for digit, index in hiddenSingles.items():
                 row, col = unit.getBoardPosition(index)
-                tech = HiddenSingle([ValueChangeMove(row, col, None, digit)], unit)
+                tech = HiddenSingle([ValueChangeMove(row, col, digit)], unit)
                 found.append(tech)
 
         return found # Known "bug": might contain duplicates. Say if a block and a column share a hidden single. Whatever.
