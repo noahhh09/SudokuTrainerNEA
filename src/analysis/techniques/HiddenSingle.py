@@ -51,3 +51,6 @@ class HiddenSingle(Technique):
                 singleOccurences[digit] = position
 
         return singleOccurences
+
+    def __str__(self) -> str:
+        return f"{self.__class__.__name__}({self.unit.unitType.name} {self.unit.unitIndex} {self.moves})"
