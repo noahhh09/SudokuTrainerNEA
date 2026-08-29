@@ -14,6 +14,7 @@ class Game:
     def makeMove(self, move: Move):
         move.apply(self.boardState)
         self.undoStack.push(move)
+        self.redoStack.clear()
 
     def undoLastMove(self):
         if (self.undoStack.isEmpty()):
@@ -29,4 +30,5 @@ class Game:
             return
 
         move: Move = self.redoStack.pop()
-        self.makeMove(move)
+        move.apply(self.boardState)
+        self.undoStack.push(move)

@@ -50,3 +50,4 @@ class MainMenuPage(ctk.CTkFrame):
 
         bs = BoardState.deserialise(df.iloc[0]["SerialisedBoard"])
         self.loadBoardStateCommand(bs)
+        print(df.iloc[0].to_json())

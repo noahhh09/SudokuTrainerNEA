@@ -11,5 +11,9 @@ class Stack():
     def peek(self):
         return self.items[-1]
 
+    def clear(self):
+        while not self.isEmpty():
+            self.pop()
+
     def isEmpty(self) -> bool:
         return len(self.items) == 0

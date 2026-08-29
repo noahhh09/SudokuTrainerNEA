@@ -20,9 +20,19 @@ conn = sqlite3.connect("sudoku.db")
 # board = BoardState.deserialise(df["SerialisedBoard"].iloc[0])
 # print(NakedTriple.findAvailable(board))
 
+# df = pd.read_sql_query("""
+#     SELECT COUNT(*)
+#     FROM PuzzleTags
+#     WHERE Tag = 'NakedTriple'
+# """, conn)
+# print(df)
+
+findString: str = "x42f4f3fx18f/x36fx21fx2/6f5fx17fx5/1fx36fx4/x18fx25f2f6fx2/x31fx32fx1/x27f3fx15f9fx2/x19fx58fx1/x11fx24fx35f"
 df = pd.read_sql_query("""
-    SELECT COUNT(*)
-    FROM PuzzleTags
-    WHERE Tag = 'NakedTriple'
+    SELECT P.SerialisedBoard, P.difficulty
+    FROM Puzzles P
+    ORDER BY P.difficulty DESC
+    LIMIT 5
 """, conn)
-print(df)
+for n in range(5):
+    print(df["SerialisedBoard"].iloc[n], df["difficulty"].iloc[n])
