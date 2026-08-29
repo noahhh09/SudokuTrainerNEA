@@ -5,9 +5,9 @@ from src.core.Cell import Cell
 
 
 class UnitType(Enum):
-    ROW = "row"
-    COLUMN = "column"
-    BLOCK = "block"
+    Row = "row"
+    Column = "column"
+    Block = "block"
 
 
 class Unit:
@@ -18,11 +18,11 @@ class Unit:
 
     def getBoardPosition(self, index: int) -> tuple[int, int]:
         match self.unitType:
-            case UnitType.ROW:
+            case UnitType.Row:
                 return (self.unitIndex, index)
-            case UnitType.COLUMN:
+            case UnitType.Column:
                 return (index, self.unitIndex)
-            case UnitType.BLOCK:
+            case UnitType.Block:
                 row = (self.unitIndex // 3) * 3 + (index // 3)
                 col = (self.unitIndex % 3) * 3 + (index % 3)
                 
