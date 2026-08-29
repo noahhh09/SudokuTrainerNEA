@@ -69,5 +69,5 @@ class SudokuPage(ctk.CTkFrame):
                 
         if move is not None:
             self.game.makeMove(move)
-            self.sudokuGrid.redrawCell(row, col) # Less heavy method than using grid.redraw()
+            self.sudokuGrid.redraw()
             self.feed.repopulate(self.game.boardState)

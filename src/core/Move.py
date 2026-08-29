@@ -1,3 +1,5 @@
+from src.analysis import BoardUtils
+
 from .BoardState import BoardState
 
 
@@ -28,6 +30,7 @@ class ValueChangeMove(Move):
 
         self.oldValue: int | None = None
         self.applied = False
+        self.removedCandidatePositions: list[tuple[int, int]] = []
 
     def apply(self, board: BoardState):
         cell = board.getCell(self.row, self.col)
@@ -36,6 +39,13 @@ class ValueChangeMove(Move):
             if not self.applied:
                 self.applied = True
                 self.oldValue = cell.getValue()
+
+            # O6.3. The system shall selectively remove candidates from cells in the same row/block/column if the user inputs a number into a cell.
+            for unit in BoardUtils.getCellUnits(board, self.row, self.col):
+                for i, subcell in enumerate(unit.cells):
+                    if self.newValue in subcell.getCandidates():
+                        subcell.removeCandidate(self.newValue)
+                        self.removedCandidatePositions.append(unit.getBoardPosition(i))
 
             cell.setValue(self.newValue)
 
@@ -47,6 +57,10 @@ class ValueChangeMove(Move):
 
         if cell.isEditable() and cell.getValue() == self.newValue:
             cell.setValue(self.oldValue)
+
+            if self.newValue is not None:
+                for row, col in self.removedCandidatePositions:
+                    board.getCell(row, col).addCandidate(self.newValue)
 
     def __str__(self) -> str:
         return f"ValueChangeMove({self.row}, {self.col}, {self.oldValue}, {self.newValue})"
