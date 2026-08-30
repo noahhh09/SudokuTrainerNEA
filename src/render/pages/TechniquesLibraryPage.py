@@ -58,6 +58,7 @@ class TechniqueWidget(ctk.CTkFrame):
 
     def practiceTechnique(self):
         conn = sqlite3.connect("sudoku.db")
+        # AI disclosure - somewhat AI generated (adapted). Will refactor.
         df = pd.read_sql_query("""
         SELECT P.PuzzleID, P.SerialisedBoard, P.clues, P.difficulty
         FROM Puzzles P
