@@ -56,10 +56,10 @@ class NakedTriple(Technique):
     displayName = "Naked Triple"
     description = "A technique where three cells contain only three mutual candidates between them, allowing candidates to be ruled out in other cells."
 
-    def __init__(self, moves: list[Move], unit: Unit, group: set[int], union: set[int]):
+    def __init__(self, moves: list[Move], unit: Unit, groupPositions: set[int], union: set[int]):
         super().__init__(moves)
         self.unit = unit
-        self.groupPositions = group
+        self.groupPositions = groupPositions
         self.union = union
 
     @staticmethod

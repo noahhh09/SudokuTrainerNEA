@@ -30,7 +30,7 @@ class MainMenuPage(ctk.CTkFrame):
 
         # TODO - Remove, used to arbitrarily load a board state.
         entryInput = tk.StringVar()
-        entryInput.set("5fx37f8f9fx2/6fx12f1fx34f8f/1f9fx13fx25fx17f/x15fx17f6f1f4f2f3f/x26f8f5f3fx19f1f/x11f3fx12fx36f/9f6f1fx27f2f8f4f/2fx56f3f5f/x14f5fx31f7f9f")
+        entryInput.set("x47f8fx3/x55fx28f/1fx23fx5/x37fx11f4fx2/4f2fx18fx27fx2/x42fx18fx2/x16f1f5f3f7fx24f/x41fx4/x48fx11fx19f")
         self.entry = ctk.CTkEntry(self, width=400, textvariable=entryInput)
         self.entry.place(anchor="nw")
         self.entry.bind("<Return>", lambda _: self.loadBoardStateCommand(BoardState.deserialise(self.entry.get())))

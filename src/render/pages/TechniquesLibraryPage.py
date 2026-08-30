@@ -7,6 +7,8 @@ from src.analysis import ALL_TECHNIQUES
 from src.analysis.Technique import Technique
 from src.core.BoardState import BoardState
 
+MAX_PER_ROW = 5
+
 class TechniquesLibraryPage(ctk.CTkFrame):
     def __init__(self, master, mainMenuCommand, loadBoardStateCommand, **kwargs):
         super().__init__(master, **kwargs)
@@ -18,7 +20,7 @@ class TechniquesLibraryPage(ctk.CTkFrame):
 
         for i, technique in enumerate(ALL_TECHNIQUES):
             widget = TechniqueWidget(self.techniquesGrid, technique=technique, loadBoardStateCommand=loadBoardStateCommand)
-            widget.grid(column=i % 4, row=i // 4, padx=(0 if i % 4 == 0 else 5, 5), pady=(5, 5))
+            widget.grid(column=i % MAX_PER_ROW, row=i // MAX_PER_ROW, padx=(0 if i % MAX_PER_ROW == 0 else 5, 5), pady=(5, 5))
 
         self.techniquesGrid.place(relx=0.5, rely=0.1, relwidth=1, relheight=0.8, anchor="n")
 
@@ -30,7 +32,7 @@ class TechniqueWidget(ctk.CTkFrame):
         self.technique = technique
         self.loadBoardStateCommand = loadBoardStateCommand
 
-        self.nameLabel = ctk.CTkLabel(self, text=technique.displayName, font=ctk.CTkFont(size=24, weight="bold"))
+        self.nameLabel = ctk.CTkLabel(self, text=technique.displayName, font=ctk.CTkFont(size=24, weight="bold"), wraplength=168)
         self.nameLabel.place(relx=0.5, rely=0.1, relwidth=1, anchor="n")
 
         self.descriptionLabel = ctk.CTkLabel(self, text=technique.description, wraplength=168, font=ctk.CTkFont(size=14))
