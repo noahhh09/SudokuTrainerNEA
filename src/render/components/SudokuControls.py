@@ -17,6 +17,7 @@ class EditState(Enum):
         id = self.id + 1 % len(EditState)
         return EditState.fromId(id)
 
+    # AI disclosure - Asked "How do i get a state from an id?" along with this enum's definition, entries and its __init__ function only.
     @staticmethod
     def fromId(id: int) -> EditState:
         for state in EditState:
