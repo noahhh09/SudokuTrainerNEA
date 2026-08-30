@@ -1,3 +1,5 @@
+import json
+import random
 import sqlite3
 from typing import Any
 
@@ -40,14 +42,13 @@ class MainMenuPage(ctk.CTkFrame):
         df = pd.read_sql_query("""
         SELECT P.PuzzleID, P.SerialisedBoard, P.clues, P.difficulty
         FROM Puzzles P
-        ORDER BY RANDOM()
-        LIMIT 1
 """, conn)
 
         if df.empty:
             print("No puzzles found")
             return
 
-        bs = BoardState.deserialise(df.iloc[0]["SerialisedBoard"])
+        randomIndex = random.randrange(len(df))
+        puzzleData = json.loads(df.iloc[randomIndex].to_json())
+        bs = BoardState.deserialise(puzzleData["SerialisedBoard"])
         self.loadBoardStateCommand(bs)
-        print(df.iloc[0].to_json())

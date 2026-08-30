@@ -1,4 +1,6 @@
+import random
 import sqlite3
+import json
 
 import customtkinter as ctk
 import pandas as pd
@@ -58,23 +60,20 @@ class TechniqueWidget(ctk.CTkFrame):
 
     def practiceTechnique(self):
         conn = sqlite3.connect("sudoku.db")
-        # AI disclosure - somewhat AI generated (adapted). Will refactor.
         df = pd.read_sql_query("""
         SELECT P.PuzzleID, P.SerialisedBoard, P.clues, P.difficulty
         FROM Puzzles P
         INNER JOIN PuzzleTags
             ON P.PuzzleID = PuzzleTags.PuzzleID
-        WHERE PuzzleTags.Tag IN (?)
-        GROUP BY P.PuzzleID
-        ORDER BY RANDOM()
-        LIMIT 1
+        WHERE PuzzleTags.Tag = ?
 """, conn, params=(self.technique.__name__,))
         conn.close()
 
         if df.empty:
             print("No puzzles found matching constraints")
             return
-        
-        # TODO - Check - for now get 1st element
-        bs = BoardState.deserialise(df.iloc[0]["SerialisedBoard"])
+
+        randomIndex = random.randrange(len(df))
+        puzzleData = json.loads(df.iloc[randomIndex].to_json())
+        bs = BoardState.deserialise(puzzleData["SerialisedBoard"])
         self.loadBoardStateCommand(bs)
