@@ -8,13 +8,16 @@ class PointingGroup(Technique):
     displayName = "Pointing Pair/Triple"
     description = "When candidates are confined to a row/column inside a block, so other instances of the candidate in that row or column can be ruled out."
 
-    def __init__(self, moves: list[Move], affectedUnit: Unit, relatedBlockUnit: Unit, groupPositions: set[tuple[int, int]], digit: int, degree: int) -> None:
+    def __init__(self, moves: list[Move], affectedUnit: Unit, causalBlockUnit: Unit, casualPositions: set[tuple[int, int]], digit: int, degree: int) -> None:
         super().__init__(moves)
         self.affectedUnit = affectedUnit
-        self.relatedBlockUnit = relatedBlockUnit
-        self.groupPositions = groupPositions
+        self.causalBlockUnit = causalBlockUnit
+        self.casualPositions = casualPositions
         self.digit = digit
         self.degree = degree
+
+    def identity(self) -> str:
+        return f"{self.__class__.__name__};{self.causalBlockUnit};{self.casualPositions};{self.affectedUnit};{self.digit}"
 
     # Pointing techniques exist in two forms - pointing pair and pointing triple. Both are very similar.
     # Summary: all instances of a candidate in a block belong to the same, single unit. -> Eliminate all other candidates not in that unit.
@@ -92,4 +95,4 @@ class PointingGroup(Technique):
         return found
 
     def __str__(self) -> str:
-        return f"{self.__class__.__name__}(DEGREE {self.degree} DIGIT {self.digit} BY {self.relatedBlockUnit.unitType.name} {self.relatedBlockUnit.unitIndex} AFFECTS {self.affectedUnit.unitType.name} {self.affectedUnit.unitIndex}, {self.moves})"
+        return f"{self.__class__.__name__}(DEGREE {self.degree} DIGIT {self.digit} BY {self.causalBlockUnit} AFFECTS {self.affectedUnit}, {self.moves})"

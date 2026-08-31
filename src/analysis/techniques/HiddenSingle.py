@@ -9,9 +9,14 @@ class HiddenSingle(Technique):
     displayName = "Hidden Single"
     description = "A simple technique where a candidate only appears in one cell."
 
-    def __init__(self, moves: list[Move], unit: Unit) -> None:
-        self.unit = unit
+    def __init__(self, moves: list[Move], causalUnit: Unit, pos: tuple[int, int], digit: int) -> None:
         super().__init__(moves)
+        self.causalUnit = causalUnit
+        self.pos = pos
+        self.digit = digit
+
+    def identity(self) -> str:
+        return f"{self.__class__.__name__};{self.causalUnit};{self.pos};{self.digit}"
 
     @staticmethod
     def findAvailable(state: BoardState) -> list[Technique]:
@@ -24,7 +29,7 @@ class HiddenSingle(Technique):
             hiddenSingles = HiddenSingle._findHiddenSinglesInUnit(unit)
             for digit, index in hiddenSingles.items():
                 row, col = unit.getBoardPosition(index)
-                tech = HiddenSingle([ValueChangeMove(row, col, digit)], unit)
+                tech = HiddenSingle([ValueChangeMove(row, col, digit)], unit, (row, col), digit)
                 found.append(tech)
 
         return found # Known "bug": might contain duplicates. Say if a block and a column share a hidden single. Whatever.
@@ -53,4 +58,4 @@ class HiddenSingle(Technique):
         return singleOccurences
 
     def __str__(self) -> str:
-        return f"{self.__class__.__name__}({self.unit.unitType.name} {self.unit.unitIndex} {self.moves})"
+        return f"{self.__class__.__name__}({self.causalUnit.unitType.name} {self.causalUnit.unitIndex} {self.moves})"

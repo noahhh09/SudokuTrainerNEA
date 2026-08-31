@@ -11,11 +11,14 @@ class NakedPair(Technique):
     displayName = "Naked Pair"
     description = "A technique where two cells exclusively have the same two candidates remaining."
 
-    def __init__(self, moves: list[Move], unit: Unit, group: set[int], union: set[int]):
+    def __init__(self, moves: list[Move], unit: Unit, causalPositions: set[int], candidateUnion: set[int]):
         super().__init__(moves)
         self.unit = unit
-        self.groupPositions = group
-        self.union = union
+        self.causalPositions = causalPositions
+        self.candidateUnion = candidateUnion
+
+    def identity(self) -> str:
+        return f"{self.__class__.__name__};{self.unit};{self.causalPositions};{self.candidateUnion}"
 
     @staticmethod
     def findAvailable(state: BoardState) -> list[Technique]:
@@ -50,7 +53,7 @@ class NakedPair(Technique):
 
     # Used for debugging.
     def __str__(self) -> str:
-        return f"{self.__class__.__name__}({self.unit.unitType.name} {self.unit.unitIndex} POSITIONS{self.groupPositions} UNION{self.union}, {self.moves})"
+        return f"{self.__class__.__name__}({self.unit.unitType.name} {self.unit.unitIndex} POSITIONS{self.causalPositions} UNION{self.candidateUnion}, {self.moves})"
 
 class NakedTriple(Technique):
     displayName = "Naked Triple"

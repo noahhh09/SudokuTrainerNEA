@@ -27,3 +27,9 @@ class Unit:
                 col = (self.unitIndex % 3) * 3 + (index % 3)
                 
                 return (row, col)
+
+    def __str__(self) -> str:
+        return f"{self.unitType.name} {self.unitIndex}"
+
+    def __repr__(self) -> str:
+        return self.__str__()

@@ -10,7 +10,10 @@ class Technique:
 
     @staticmethod
     def findAvailable(state: BoardState) -> list[Technique]:
-        raise NotImplementedError
+        raise NotImplementedError()
+
+    def identity(self) -> str:
+        raise NotImplementedError()
 
     # Used for debugging.
     def __str__(self) -> str:
