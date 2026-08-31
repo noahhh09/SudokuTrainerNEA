@@ -7,12 +7,15 @@ from src.render.pages.TechniquesLibraryPage import TechniquesLibraryPage
 
 import customtkinter as ctk
 
+RATIO = 720 / 1280
+WIDTH = 1440
+
 class App(ctk.CTk):
     def __init__(self, fg_color: str | Tuple[str, str] | None = None, **kwargs):
         super().__init__(fg_color, **kwargs)
 
         self.title("Sudoku Trainer")
-        self.geometry("1280x720")
+        self.geometry(f"{WIDTH}x{(WIDTH * RATIO) // 1}")
 
         self.page: ctk.CTkFrame | None = None
 

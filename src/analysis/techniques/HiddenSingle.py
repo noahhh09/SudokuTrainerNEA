@@ -18,6 +18,15 @@ class HiddenSingle(Technique):
     def identity(self) -> str:
         return f"{self.__class__.__name__};{self.causalUnit};{self.pos};{self.digit}"
 
+    def getHintData(self) -> dict[str, str]:
+        row, col = self.pos
+
+        return {
+            "Digit": str(self.digit),
+            "Cell Position": f"Row {row + 1}, Column {col + 1}",
+            "Causal Unit": f"{self.causalUnit.unitType.name} {self.causalUnit.unitIndex + 1}"
+        }
+
     @staticmethod
     def findAvailable(state: BoardState) -> list[Technique]:
         found: list[Technique] = []

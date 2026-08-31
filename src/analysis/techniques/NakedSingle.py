@@ -16,6 +16,14 @@ class NakedSingle(Technique):
     def identity(self) -> str:
         return f"{self.__class__.__name__};{self.pos}{self.digit}"
 
+    def getHintData(self) -> dict[str, str]:
+        row, col = self.pos
+
+        return {
+            "Cell Position": f"Row {row + 1}, Column {col + 1}",
+            "Digit": str(self.digit)
+        }
+
     @staticmethod
     def findAvailable(state: BoardState) -> list[Technique]:
         candidateState = BoardUtils.copyAndPopulateCandidates(state)

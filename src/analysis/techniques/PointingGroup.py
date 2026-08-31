@@ -12,12 +12,24 @@ class PointingGroup(Technique):
         super().__init__(moves)
         self.affectedUnit = affectedUnit
         self.causalBlockUnit = causalBlockUnit
-        self.casualPositions = casualPositions
+        self.causalPositions = casualPositions
         self.digit = digit
         self.degree = degree
 
     def identity(self) -> str:
-        return f"{self.__class__.__name__};{self.causalBlockUnit};{self.casualPositions};{self.affectedUnit};{self.digit}"
+        return f"{self.__class__.__name__};{self.causalBlockUnit};{self.causalPositions};{self.affectedUnit};{self.digit}"
+
+    def getHintData(self) -> dict[str, str]:
+        causalUnit = self.causalBlockUnit
+        affectedUnit = self.affectedUnit
+
+        return {
+            "Degree": str(self.degree),
+            "Causal Block": f"{causalUnit.unitType.name} {causalUnit.unitIndex + 1}",
+            "Digit": str(self.digit),
+            "Affected Unit": f"{affectedUnit.unitType.name} {affectedUnit.unitIndex + 1}",
+            "Causal Positions": " ".join(f"{pos[0], pos[1]}" for pos in self.causalPositions),
+        }
 
     # Pointing techniques exist in two forms - pointing pair and pointing triple. Both are very similar.
     # Summary: all instances of a candidate in a block belong to the same, single unit. -> Eliminate all other candidates not in that unit.

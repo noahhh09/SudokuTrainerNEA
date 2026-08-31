@@ -20,6 +20,15 @@ class NakedPair(Technique):
     def identity(self) -> str:
         return f"{self.__class__.__name__};{self.unit};{self.causalPositions};{self.candidateUnion}"
 
+    def getHintData(self) -> dict[str, str]:
+        unit = self.unit
+
+        return {
+            "Unit": str(unit),
+            "Causal Positions": " ".join(f"{pos[0], pos[1]}" for pos in (unit.getBoardPosition(relPos) for relPos in self.causalPositions)),
+            "Digits": ", ".join(str(digit) for digit in sorted(list(self.candidateUnion)))
+        }
+
     @staticmethod
     def findAvailable(state: BoardState) -> list[Technique]:
         candidatesState = BoardUtils.copyAndPopulateCandidates(state) # TODO: Change to preserve eliminations
@@ -59,11 +68,23 @@ class NakedTriple(Technique):
     displayName = "Naked Triple"
     description = "A technique where three cells contain only three mutual candidates between them, allowing candidates to be ruled out in other cells."
 
-    def __init__(self, moves: list[Move], unit: Unit, groupPositions: set[int], union: set[int]):
+    def __init__(self, moves: list[Move], unit: Unit, causalPositions: set[int], candidateUnion: set[int]):
         super().__init__(moves)
         self.unit = unit
-        self.groupPositions = groupPositions
-        self.union = union
+        self.causalPositions = causalPositions
+        self.candidateUnion = candidateUnion
+
+    def identity(self) -> str:
+        return f"{self.__class__.__name__};{self.unit};{self.causalPositions};{self.candidateUnion}"
+
+    def getHintData(self) -> dict[str, str]:
+        unit = self.unit
+
+        return {
+            "Unit": str(unit),
+            "Causal Positions": " ".join(f"{pos[0] + 1, pos[1] + 1}" for pos in (unit.getBoardPosition(relPos) for relPos in self.causalPositions)),
+            "Digits": " ".join(str(digit) for digit in sorted(list(self.candidateUnion)))
+        }
 
     @staticmethod
     def findAvailable(state: BoardState) -> list[Technique]:
@@ -98,7 +119,7 @@ class NakedTriple(Technique):
 
     # Used for debugging.
     def __str__(self) -> str:
-        return f"{self.__class__.__name__}({self.unit.unitType.name} {self.unit.unitIndex} POSITIONS{self.groupPositions} UNION{self.union}, {self.moves})"
+        return f"{self.__class__.__name__}({self.unit.unitType.name} {self.unit.unitIndex} POSITIONS{self.causalPositions} UNION{self.candidateUnion}, {self.moves})"
 
 # Returns [(relPositions, candidateValues)]
 # TODO - Remove lower degree naked groups from this set.

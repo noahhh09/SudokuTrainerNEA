@@ -15,6 +15,9 @@ class Technique:
     def identity(self) -> str:
         raise NotImplementedError()
 
+    def getHintData(self) -> dict[str, str]:
+        raise NotImplementedError()
+
     # Used for debugging.
     def __str__(self) -> str:
         return f"{self.__class__.__name__}({self.moves})"
@@ -22,4 +25,3 @@ class Technique:
     # Used for debugging.
     def __repr__(self) -> str:
         return self.__str__()
-
