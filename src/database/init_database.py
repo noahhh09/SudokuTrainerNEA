@@ -15,7 +15,7 @@ from pathlib import Path
 import pandas as pd
 import sqlite3
 
-from src.analysis import ALL_TECHNIQUES
+from src.analysis import ALL_TECHNIQUE_TYPES
 from src.core.BoardState import BoardState
 
 global n
@@ -55,7 +55,7 @@ def convertPuzzleString(puzzle: str):
 
 def applyTags(row):
     boardState = BoardState.deserialise(row["SerialisedBoard"])
-    techniques = ALL_TECHNIQUES
+    techniques = ALL_TECHNIQUE_TYPES
 
     tags = []
 

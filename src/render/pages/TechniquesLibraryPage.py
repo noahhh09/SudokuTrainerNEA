@@ -5,7 +5,7 @@ import json
 import customtkinter as ctk
 import pandas as pd
 
-from src.analysis import ALL_TECHNIQUES
+from src.analysis import ALL_TECHNIQUE_TYPES
 from src.analysis.Technique import Technique
 from src.core.BoardState import BoardState
 
@@ -20,7 +20,7 @@ class TechniquesLibraryPage(ctk.CTkFrame):
 
         self.techniquesGrid = ctk.CTkScrollableFrame(self)
 
-        for i, technique in enumerate(ALL_TECHNIQUES):
+        for i, technique in enumerate(ALL_TECHNIQUE_TYPES):
             widget = TechniqueWidget(self.techniquesGrid, technique=technique, loadBoardStateCommand=loadBoardStateCommand)
             widget.grid(column=i % MAX_PER_ROW, row=i // MAX_PER_ROW, padx=(0 if i % MAX_PER_ROW == 0 else 5, 5), pady=(5, 5))
 

@@ -35,9 +35,9 @@ class SudokuFeed(ctk.CTkFrame):
             widget.grid(row=len(self.feedWidgets), sticky="ew", pady=(0 if len(self.feedWidgets) == 0 else 5, 0))
             self.feedWidgets.append(widget)
 
-        for tech in ALL_TECHNIQUES:
-            available = tech.findAvailable(board)
-            print(tech.__name__, len(available), available)
+        for techniqueType in ALL_TECHNIQUE_TYPES:
+            techniques = techniqueType.findAvailable(board)
+            print(techniqueType.__name__, len(techniques), techniques)
             print("")
 
 

@@ -2,7 +2,6 @@ from typing import Any
 
 import customtkinter as ctk
 
-from src.analysis import ALL_TECHNIQUES
 from src.core.BoardState import BoardState
 from src.core.Move import Move, ValueChangeMove, CandidateChangeMove, EliminationChangeMove
 from src.core.Game import Game
