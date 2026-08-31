@@ -19,6 +19,7 @@ class SudokuFeed(ctk.CTkFrame):
 
         self.feedFrame = ctk.CTkScrollableFrame(self, width=500)
         self.feedFrame.grid(row=1, column=0, padx=5, pady=(0, 5), sticky="nsew")
+        self.feedFrame.columnconfigure(0, weight=1) # Allows the feed widgets to take up the frames full width.
 
         self.feedWidgets: list[ctk.CTkBaseClass] = []
 
@@ -42,10 +43,12 @@ class SudokuFeed(ctk.CTkFrame):
 
 class ContradictionWidget(ctk.CTkFrame):
     def __init__(self, master: Any, contra: Contradictions.Contradiction):
-        super().__init__(master, border_width=2)
+        super().__init__(master, border_width=2, border_color="#ee0000")
 
-        titleLabel = ctk.CTkLabel(self, text="Contradiction")
+        contraFont = ctk.CTkFont(size=16, weight="bold")
+
+        titleLabel = ctk.CTkLabel(self, text="Contradiction", font=contraFont)
         titleLabel.grid(row=0, column=0, sticky="w", padx=2, pady=2)
 
-        description = ctk.CTkLabel(self, text=f"There are {len(contra.cellsInvolved)} {contra.value}s in {contra.unitType.name} {contra.unitIndex + 1}")
+        description = ctk.CTkLabel(self, text=f"There are {len(contra.cellsInvolved)} of the digit {contra.value} in {contra.unitType.name} {contra.unitIndex + 1}")
         description.grid(row=1, column=0, sticky="w", padx=2, pady=2)
