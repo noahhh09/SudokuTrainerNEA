@@ -1,4 +1,6 @@
+from src.analysis import BoardUtils
 from src.analysis.Technique import Technique
+from src.analysis.techniques import NakedGroup
 from src.analysis.techniques.NakedSingle import NakedSingle
 from src.analysis.techniques.NakedGroup import NakedPair, NakedTriple
 from src.core.BoardState import BoardState
@@ -79,3 +81,24 @@ state10 = BoardState.deserialise(
 for t in ALL:
     print(t.findAvailable(state10))
     # Expected result: NakedTriple(ROW 2, POSITIONS {1,2,5}, UNION {2,8,9}) AND NakedTriple(COL 7, POSITIONS {1,6,7}, UNION {3,4,8}) AND NakedTriple(BLK 2, POSITIONS {idk}, UNION {2,4,8})
+
+
+# High degree test:
+state11 = BoardState.deserialise(
+    "x24f6f7fx4/6f7fx11fx15f3f4f8f/x44f2fx16f7f/8fx19fx6/4fx28f5fx29f1f/x11fx19f2f4fx15f6f/x43f7f2f8fx1/x18fx14fx26fx2/3f4f5fx26f1fx19f"
+)
+candidatesState11 = BoardUtils.copyAndPopulateCandidates(state11)
+for unit in BoardUtils.getAllUnits(candidatesState11):
+    cells = list(enumerate(unit.cells))
+
+    degree4 = NakedGroup._findNakedGroups(cells, 4)
+
+state12 = state12 = BoardState.deserialise(
+    "8fx34f7fx3/x48fx16fx15f/x15f2fx13fx4/1f2fx14fx5/x29fx58f/x63fx2/x37fx5/4fx22fx36fx1/2f3fx25f9fx21f"
+)
+candidatesState12 = BoardUtils.copyAndPopulateCandidates(state12)
+for unit in BoardUtils.getAllUnits(candidatesState12):
+    cells = list(enumerate(unit.cells))
+
+    degree4 = NakedGroup._findNakedGroups(cells, 3)
+    print(unit, degree4)
