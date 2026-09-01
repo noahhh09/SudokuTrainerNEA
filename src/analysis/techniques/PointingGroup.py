@@ -25,10 +25,10 @@ class PointingGroup(Technique):
 
         return {
             "Degree": str(self.degree),
-            "Causal Block": f"{causalUnit.unitType.name} {causalUnit.unitIndex + 1}",
             "Digit": str(self.digit),
-            "Affected Unit": f"{affectedUnit.unitType.name} {affectedUnit.unitIndex + 1}",
+            "Causal Block": f"{causalUnit.unitType.name} {causalUnit.unitIndex + 1}",
             "Causal Positions": " ".join(f"{pos[0], pos[1]}" for pos in self.causalPositions),
+            "Affected Unit": f"{affectedUnit.unitType.name} {affectedUnit.unitIndex + 1}",
         }
 
     # Pointing techniques exist in two forms - pointing pair and pointing triple. Both are very similar.
