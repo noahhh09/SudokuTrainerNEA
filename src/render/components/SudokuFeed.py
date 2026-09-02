@@ -65,8 +65,6 @@ class SudokuFeed(ctk.CTkFrame):
         if identity in self.revealedHintProperties:
             del self.revealedHintProperties[identity]
 
-        self.repopulate(self.board)
-
     def revealHintProperty(self, techniqueIdentity: str, propertyName: str):
         revealed = self.revealedHintProperties[techniqueIdentity] if techniqueIdentity in self.revealedHintProperties else []
         if propertyName not in revealed:
@@ -95,6 +93,8 @@ class HintWidget(ctk.CTkFrame):
         self.technique = technique
         identity = technique.identity()
 
+        self.discardCommand = discardCommand
+
         self.columnconfigure(0, weight=1)
         # self.columnconfigure(1, weight=1)
 
@@ -102,7 +102,7 @@ class HintWidget(ctk.CTkFrame):
         titleLabel = ctk.CTkLabel(self, text="Hint", font=titleFont)
         titleLabel.grid(row=0, column=0, sticky="w", padx=(5,0), pady=5)
 
-        clearButton = ctk.CTkButton(self, text="Discard", fg_color="#ff0000", command=lambda: discardCommand(technique))
+        clearButton = ctk.CTkButton(self, text="Discard", fg_color="#ff0000", command=self.discard)
         clearButton.grid(row=0, column=1, sticky="e", padx=(0,5), pady=5)
         
         hintData = {"Technique Type": technique.__class__.displayName, **technique.getHintData()}
@@ -121,3 +121,7 @@ class HintWidget(ctk.CTkFrame):
 
         applyButton = ctk.CTkButton(self, text="Apply", fg_color="#ff0000", command=lambda technique=technique: applyCommand(technique))
         applyButton.grid(row=len(hintData) + 1, column=0, sticky="e", columnspan=2, padx=(0,5), pady=3)
+
+    def discard(self):
+        self.discardCommand(self.technique)
+        self.grid_forget()
