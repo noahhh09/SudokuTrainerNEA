@@ -1,6 +1,8 @@
 from typing import Tuple
 from src.analysis import BoardUtils
 from src.core.BoardState import BoardState
+from src.render.pages.AccountsPageLoggedIn import AccountsPageLoggedIn
+from src.render.pages.AccountsPageLoggedOut import AccountsPageLoggedOut
 from src.render.pages.MainMenuPage import MainMenuPage
 from src.render.pages.SudokuPage import SudokuPage
 from src.render.pages.TechniquesLibraryPage import TechniquesLibraryPage
@@ -10,9 +12,12 @@ import customtkinter as ctk
 RATIO = 720 / 1280
 WIDTH = 1440
 
+
 class App(ctk.CTk):
     def __init__(self, fg_color: str | Tuple[str, str] | None = None, **kwargs):
         super().__init__(fg_color, **kwargs)
+
+        self.accountID: int | None = None
 
         self.title("Sudoku Trainer")
         self.geometry(f"{WIDTH}x{(WIDTH * RATIO) // 1}")
@@ -32,18 +37,10 @@ class App(ctk.CTk):
         self.__setPage(
             MainMenuPage(
                 self,
+                accountId=self.accountID,
                 loadBoardStateCommand=self.loadBoardStatePuzzle,
                 techniquesPageCommand=self.techniquesPage,
                 accountsPageCommand=self.accountsPage
-            )
-        )
-
-    def newPuzzle(self):
-        self.__setPage(
-            SudokuPage(
-                self,
-                BoardState.deserialise("1fx25fx13f7fx2/6fx13fx28fx19fx1/x59f8fx2/x11fx7/8f7f6f1fx5/x56fx3/x87f/x18fx19fx17f6fx14f/7fx36fx13f1f2f"),
-                mainMenuCommand=self.mainMenu
             )
         )
 
@@ -68,4 +65,24 @@ class App(ctk.CTk):
         )
 
     def accountsPage(self):
-        pass
+        if self.accountID is None:
+            self.__setPage(
+                AccountsPageLoggedOut(
+                    self,
+                    mainMenuCommand=self.mainMenu,
+                    setIdCommand=self.setAccountId,
+                    accountsPageCommand=self.accountsPage
+                )
+            )
+        else:
+            self.__setPage(
+                AccountsPageLoggedIn(
+                    self,
+                    accountId=self.accountID,
+                    mainMenuCommand=self.mainMenu,
+                    accountsPageCommand=self.accountsPage
+                )
+            )
+
+    def setAccountId(self, id):
+        self.accountID = id

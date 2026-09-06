@@ -10,7 +10,7 @@ import pandas as pd
 from src.core.BoardState import BoardState
 
 class MainMenuPage(ctk.CTkFrame):
-    def __init__(self, master: Any, loadBoardStateCommand, techniquesPageCommand, accountsPageCommand, **kwargs):
+    def __init__(self, master: Any, accountId: int | None, loadBoardStateCommand, techniquesPageCommand, accountsPageCommand, **kwargs):
         super().__init__(master, **kwargs)
 
         self.loadBoardStateCommand = loadBoardStateCommand
@@ -20,6 +20,22 @@ class MainMenuPage(ctk.CTkFrame):
 
         self.titleLabel = ctk.CTkLabel(self, text="Learn Sudoku", font=self.titleFont)
         self.titleLabel.place(relx=0.5, rely=0.2, anchor="center")
+
+        accountText = "You are not logged in. Progress will not be tracked."
+        if accountId is not None:
+            conn = sqlite3.connect("sudoku.db")
+            cursor = conn.cursor()
+            cursor.execute("""
+                SELECT AccountName
+                FROM Users
+                WHERE UserID = ?
+            """, (accountId, ))
+
+            name = cursor.fetchone()[0]
+            accountText = f"You are logged in as {name}."
+        
+        self.accountLabel = ctk.CTkLabel(self, text=accountText)
+        self.accountLabel.place(relx=0.5, rely=0.3, anchor="s")
 
         self.newPuzzleButton = ctk.CTkButton(self, text="New Puzzle", font=self.buttonFont, width=400, height=100, command=self.newPuzzle)
         self.newPuzzleButton.place(relx=0.5, rely=0.4, anchor="center")
