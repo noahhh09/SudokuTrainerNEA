@@ -8,8 +8,8 @@ from src.core.BoardState import BoardState
 from src.core.Move import Move, ValueChangeMove, CandidateChangeMove, EliminationChangeMove
 from src.core.Game import Game
 from src.render.components.SudokuFeed import SudokuFeed
-from src.render.components.SudokuControls import EditState, SudokuControls
-from src.render.components.SudokuGrid import SudokuGrid
+from src.render.components.core.SudokuControls import EditState, SudokuControls
+from src.render.components.core.SudokuGrid import SudokuGrid
 from src.render.components.SudokuHintMenu import SudokuHintMenu
 
 class SudokuPage(ctk.CTkFrame):
