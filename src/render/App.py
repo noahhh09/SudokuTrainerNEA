@@ -1,10 +1,12 @@
 from typing import Tuple
 from src.analysis import BoardUtils
+from src.analysis.Technique import Technique
 from src.core.BoardState import BoardState
 from src.render.pages.AccountsPageLoggedIn import AccountsPageLoggedIn
 from src.render.pages.AccountsPageLoggedOut import AccountsPageLoggedOut
 from src.render.pages.MainMenuPage import MainMenuPage
 from src.render.pages.SudokuPage import SudokuPage
+from src.render.pages.TechniqueLearningPage import TechniqueLearningPage
 from src.render.pages.TechniquesLibraryPage import TechniquesLibraryPage
 
 import customtkinter as ctk
@@ -45,7 +47,7 @@ class App(ctk.CTk):
         )
 
     def loadBoardStatePuzzle(self, boardState: BoardState):
-        boardState = BoardUtils.copyAndPopulateCandidates(boardState)
+        # boardState = BoardUtils.copyAndPopulateCandidates(boardState)
 
         self.__setPage(
             SudokuPage(
@@ -54,13 +56,23 @@ class App(ctk.CTk):
                 mainMenuCommand=self.mainMenu
             )
         )
+
+    def learnSpecificTechnique(self, type: type[Technique]):
+        self.__setPage(
+            TechniqueLearningPage(
+                self,
+                type,
+                mainMenuCommand=self.mainMenu,
+            )
+        )
         
     def techniquesPage(self):
         self.__setPage(
             TechniquesLibraryPage(
                 self,
                 mainMenuCommand=self.mainMenu,
-                loadBoardStateCommand=self.loadBoardStatePuzzle
+                loadBoardStateCommand=self.loadBoardStatePuzzle,
+                techniquePageCommand=self.learnSpecificTechnique
             )
         )
 

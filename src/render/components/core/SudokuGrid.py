@@ -4,6 +4,7 @@ import customtkinter as ctk
 import tkinter as tk
 
 from src.analysis import Contradictions
+from src.analysis.Unit import Unit
 from src.core.BoardState import BoardState
 from src.core.Cell import Cell
 
@@ -31,6 +32,11 @@ class SudokuGrid(ctk.CTkFrame):
 
         self.redraw()
 
+    def highlightUnit(self, unit: Unit, colour: str):
+        for i in range(9):
+            row, col = unit.getBoardPosition(i)
+            self.sudokuCells[row][col].highlight(colour)
+
     def selectCell(self, row, col):
         self.selectedCellPosition = (row, col)
 
@@ -55,7 +61,9 @@ class SudokuGrid(ctk.CTkFrame):
         for i in range(9):
             for j in range(9):
                 hasContra = (i, j) in cellsWithContradictions
-                self.sudokuCells[i][j].markContradiction(hasContra)
+
+                colour = "#ff0000" if hasContra else "white"
+                self.sudokuCells[i][j].highlight(colour)
 
 
 class SudokuCell(ctk.CTkFrame):
@@ -83,6 +91,9 @@ class SudokuCell(ctk.CTkFrame):
         self.canvas = tk.Canvas(self, width=self.size, height=self.size)
         self.canvas.pack()
         self.canvas.bind("<Button-1>", self._onClick)
+
+    def highlight(self, colour: str = "white"):
+        self.canvas.configure(bg=colour)
 
     def _onClick(self, event):
         if self.onSelectCallback is not None:
@@ -113,9 +124,3 @@ class SudokuCell(ctk.CTkFrame):
                 col = (candidate - 1) % 3
 
                 self.canvas.create_text((col + 0.5) * (self.size / 3), (row + 0.5) * (self.size / 3), font=SudokuCell.eliminatedCandidateFont, text=candidate, tags="candidate", fill="#ff0000")
-                
-    def markContradiction(self, contradiction: bool):
-        if contradiction:
-            self.canvas.configure(bg="#ff0000")
-        else:
-            self.canvas.configure(bg="white")
