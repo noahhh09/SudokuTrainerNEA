@@ -36,7 +36,7 @@ class HiddenGroup(Technique):
     # - Get candidates. 
     # - Calculate union of each pair intersection. 
     # - If len(union) == degree, then check if the intersection with all other cells is empty.
-    @classmethod
+    @classmethod # ChatGPT made me aware of the @classmethod decorator, but I researched it after the fact and deduced it was a good idea to pass up on. Everything else implemented by self.
     def findAvailable(cls, state: BoardState) -> list[Technique]:
         degree = cls.degree # Allows very easy creation of class-specific types.
         candidateState = BoardUtils.copyAndPopulateCandidates(state)
@@ -48,59 +48,41 @@ class HiddenGroup(Technique):
         for unit in units:
             cells = enumerate(unit.cells) # Add relative position to each cell so that it can be referred to later.
 
-            for cellCombination in itertools.combinations(cells, degree):
+            # Count the number of times each candidate digit appears in the unit.
+            digitOccurrences: dict[int, list[int]] = {}
+            for i, cell in cells:
+                for digit in cell.getEffectiveCandidates():
+                    digitOccurrences.setdefault(digit, [])
+                    digitOccurrences[digit].append(i)
+
+            digitOccurrences = {digit : occurrences for digit, occurrences in digitOccurrences.items() if len(occurrences) <= degree} # premature optimisation, since if a cell has more than degree candidates, it cant form that hidden group anyway
+
+            for combo in itertools.combinations(digitOccurrences.items(), degree):
                 union: set[int] = set()
-                for pair in itertools.combinations(cellCombination, 2):
-                    intersection = pair[0][1].getEffectiveCandidates() & pair[1][1].getEffectiveCandidates()
-                    union.update(intersection)
 
-                if len(union) < degree:
-                    continue
+                for digit, occurrences in combo:
+                    union.update(occurrences)
 
-                # Potential hidden group, but we need to check if they don't appear in any other cells, and that all cells in the combo affect the union.
-                # We need to check the following:
-                # - The number of cells that intersect with this candidates union == degree
-                # - Each cell that contributes when intersected with the union is non-zero in length
-
-                valid = True
-                for cell in cellCombination: # check all combo cells contribute to union.
-                    if len(cell[1].getEffectiveCandidates() & union) == 0:
-                        valid = False
-                        break
-
-                if not valid:
-                    continue
-
-                valid = True
-                toRemove: set[int] = set()
-                for digit in union:
-                    count = 0
-                    for cell in unit.cells:
-                        if digit in cell.getEffectiveCandidates():
-                            count += 1
-
-                    if count != degree:
-                        toRemove.add(digit)
-
-                union = union - toRemove
                 if len(union) != degree:
                     continue
 
-                # Valid hidden group!
-                # Test for candidates to remove.
-                
+                # We have found a hidden group.
+                # Now verify that moves can be made as a result, and create the technique instance:
+
                 moves = []
-                for relPos, cell in cellCombination:
-                    candidatesToEliminate = cell.getEffectiveCandidates() - union
-                    for n in candidatesToEliminate:
-                        row, col = unit.getBoardPosition(relPos)
-                        elim = EliminationChangeMove(row, col, n, True)
+                digits = {digit for digit, _ in combo}
+
+                for position in union:
+                    row, col = unit.getBoardPosition(position)
+                    cell = unit.cells[position]
+                    toRemove = cell.getEffectiveCandidates() - digits
+
+                    for digit in toRemove:
+                        elim = EliminationChangeMove(row, col, digit, True)
                         moves.append(elim)
 
                 if len(moves) > 0:
-                    positions = {cell[0] for cell in cellCombination}
-                    tech = cls(moves, unit, union, positions)
-
+                    tech = cls(moves, unit, digits, union)
                     found.append(tech)
 
         return found
