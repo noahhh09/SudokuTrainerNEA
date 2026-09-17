@@ -2,7 +2,7 @@ from typing import Any
 
 import customtkinter as ctk
 
-from src.analysis import ALL_TECHNIQUE_TYPES
+from src.analysis import ALL_TECHNIQUE_TYPES, BoardUtils
 from src.analysis.Technique import Technique
 from src.core.BoardState import BoardState
 from src.core.Move import Move, ValueChangeMove, CandidateChangeMove, EliminationChangeMove
@@ -15,6 +15,7 @@ from src.render.components.SudokuHintMenu import SudokuHintMenu
 class SudokuPage(ctk.CTkFrame):
     def __init__(self, master: Any, boardState: BoardState, mainMenuCommand, **kwargs):
         super().__init__(master, **kwargs)
+        boardState = BoardUtils.copyAndPopulateCandidates(boardState)
         self.game = Game(boardState)
 
         self.grid_columnconfigure(0, weight=1)

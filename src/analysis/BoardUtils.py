@@ -51,6 +51,9 @@ def _copyAndPopulateCandidates(board: BoardState) -> BoardState:
 
     return board
 
+"""
+Creates a copy of the board and populates it with all logical candidates than can be deduced, retaining user-added eliminated candidates.
+"""
 def copyAndPopulateCandidates(board: BoardState) -> BoardState:
     newBoard = _copyAndPopulateCandidates(board)
 

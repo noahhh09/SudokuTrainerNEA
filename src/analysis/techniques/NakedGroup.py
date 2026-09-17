@@ -30,8 +30,8 @@ class NakedPair(Technique):
             "Digits": ", ".join(str(digit) for digit in sorted(list(self.candidateUnion)))
         }
 
-    @staticmethod
-    def findAvailable(state: BoardState) -> list[Technique]:
+    @classmethod
+    def findAvailable(cls, state: BoardState) -> list[Technique]:
         candidatesState = BoardUtils.copyAndPopulateCandidates(state)
         units = BoardUtils.getAllUnits(candidatesState)
 
@@ -87,8 +87,8 @@ class NakedTriple(Technique):
             "Digits": " ".join(str(digit) for digit in sorted(list(self.candidateUnion)))
         }
 
-    @staticmethod
-    def findAvailable(state: BoardState) -> list[Technique]:
+    @classmethod
+    def findAvailable(cls, state: BoardState) -> list[Technique]:
         candidatesState = BoardUtils.copyAndPopulateCandidates(state)
         units = BoardUtils.getAllUnits(candidatesState)
 

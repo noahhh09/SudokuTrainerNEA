@@ -8,8 +8,8 @@ class Technique:
     def __init__(self, moves: list[Move]) -> None:
         self.moves = moves
 
-    @staticmethod
-    def findAvailable(state: BoardState) -> list[Technique]:
+    @classmethod
+    def findAvailable(cls, state: BoardState) -> list[Technique]:
         raise NotImplementedError()
 
     def identity(self) -> str:

@@ -27,8 +27,8 @@ class HiddenSingle(Technique):
             "Causal Unit": f"{self.causalUnit.unitType.name} {self.causalUnit.unitIndex + 1}"
         }
 
-    @staticmethod
-    def findAvailable(state: BoardState) -> list[Technique]:
+    @classmethod
+    def findAvailable(cls, state: BoardState) -> list[Technique]:
         found: list[Technique] = []
 
         candidateState = BoardUtils.copyAndPopulateCandidates(state)
@@ -45,8 +45,8 @@ class HiddenSingle(Technique):
 
     # Returns the RELATIVE POSITIONS of single occurrences of a candidate DIGIT in a unit.
     # Dict: [digit, position]
-    @staticmethod
-    def _findHiddenSinglesInUnit(unit: Unit) -> dict[int, int]:
+    @classmethod
+    def _findHiddenSinglesInUnit(cls, unit: Unit) -> dict[int, int]:
         singleOccurences: dict[int, int] = {}
 
         for digit in range(1, 10):

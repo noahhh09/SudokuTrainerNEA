@@ -24,8 +24,8 @@ class NakedSingle(Technique):
             "Digit": str(self.digit)
         }
 
-    @staticmethod
-    def findAvailable(state: BoardState) -> list[Technique]:
+    @classmethod
+    def findAvailable(cls, state: BoardState) -> list[Technique]:
         candidateState = BoardUtils.copyAndPopulateCandidates(state)
 
         found: list[Technique] = []

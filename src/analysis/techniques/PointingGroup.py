@@ -41,8 +41,8 @@ class PointingGroup(Technique):
     #       -> if exactly 2 or 3 cells do, find union of rows/cols they belong to
     #       -> if len(that) == 1, we have a potential pointing group
     #       -> if any possible eliminations, pointing group!
-    @staticmethod
-    def findAvailable(state: BoardState) -> list[Technique]:
+    @classmethod
+    def findAvailable(cls, state: BoardState) -> list[Technique]:
         candidatesState = BoardUtils.copyAndPopulateCandidates(state)
         found: list[Technique] = []
 
