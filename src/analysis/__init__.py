@@ -6,4 +6,4 @@ from src.analysis.techniques.HiddenSingle import HiddenSingle
 from src.analysis.techniques.PointingGroup import PointingGroup
 
 # Order by "relative simpleness" where 0th element is most simple.
-ALL_TECHNIQUE_TYPES: list[type[Technique]] = [NakedSingle, HiddenSingle, NakedPair, PointingGroup, NakedTriple, HiddenPair, HiddenTriple]
+ALL_TECHNIQUE_TYPES: list[type[Technique]] = [NakedSingle, HiddenSingle, NakedPair, HiddenPair, PointingGroup, NakedTriple, HiddenTriple]

@@ -55,7 +55,11 @@ class HiddenGroup(Technique):
                     digitOccurrences.setdefault(digit, [])
                     digitOccurrences[digit].append(i)
 
-            digitOccurrences = {digit : occurrences for digit, occurrences in digitOccurrences.items() if len(occurrences) <= degree} # premature optimisation, since if a cell has more than degree candidates, it cant form that hidden group anyway
+            digitOccurrences = {
+                digit : occurrences 
+                for digit, occurrences in digitOccurrences.items() 
+                if 0 < len(occurrences) <= degree # premature optimisation, since if a cell has more than degree candidates, it cant form that hidden group anyway
+            }
 
             for combo in itertools.combinations(digitOccurrences.items(), degree):
                 union: set[int] = set()
@@ -64,6 +68,26 @@ class HiddenGroup(Technique):
                     union.update(occurrences)
 
                 if len(union) != degree:
+                    continue
+
+                # Almost there - we now just want to check if this hidden group is formed of lower degree hidden groups, or wether it is unique.
+                valid = True
+                for i in range(1, degree): # This won't cause degree 1 searches to eliminate themselves, since the bounds would be (1,1) and no iteration would occur.
+                    for subCombo in itertools.combinations(combo, i):
+                        subUnion: set[int] = set()
+
+                        for digit, occurrences in subCombo:
+                            subUnion.update(occurrences)
+
+                        if len(subUnion) == i:
+                            # Discard.
+                            valid = False
+                            break
+
+                    if not valid:
+                        break
+
+                if not valid:
                     continue
 
                 # We have found a hidden group.
