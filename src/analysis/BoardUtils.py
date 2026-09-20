@@ -64,7 +64,7 @@ def copyAndPopulateCandidates(board: BoardState) -> BoardState:
 
     return newBoard
 
-def getCellUnits(board: BoardState, row: int, col: int) -> list[Unit]:
+def getMemberUnits(board: BoardState, row: int, col: int) -> list[Unit]:
     blockIndex = board.getBlockIndex(row, col)
 
     return [

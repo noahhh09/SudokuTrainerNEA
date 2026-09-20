@@ -41,7 +41,7 @@ class ValueChangeMove(Move):
                 self.oldValue = cell.getValue()
 
             # O6.3. The system shall selectively remove candidates from cells in the same row/block/column if the user inputs a number into a cell.
-            for unit in BoardUtils.getCellUnits(board, self.row, self.col):
+            for unit in BoardUtils.getMemberUnits(board, self.row, self.col):
                 for i, subcell in enumerate(unit.cells):
                     if self.newValue in subcell.getCandidates():
                         subcell.removeCandidate(self.newValue)
