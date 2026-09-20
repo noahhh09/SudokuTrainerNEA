@@ -19,7 +19,7 @@ class App(ctk.CTk):
     def __init__(self, fg_color: str | Tuple[str, str] | None = None, **kwargs):
         super().__init__(fg_color, **kwargs)
 
-        self.accountID: int | None = None
+        self.profileId: int | None = None
 
         self.title("Sudoku Trainer")
         self.geometry(f"{WIDTH}x{(WIDTH * RATIO) // 1}")
@@ -39,7 +39,7 @@ class App(ctk.CTk):
         self.__setPage(
             MainMenuPage(
                 self,
-                accountId=self.accountID,
+                profileId=self.profileId,
                 loadBoardStateCommand=self.loadBoardStatePuzzle,
                 techniquesPageCommand=self.techniquesPage,
                 accountsPageCommand=self.accountsPage
@@ -77,12 +77,12 @@ class App(ctk.CTk):
         )
 
     def accountsPage(self):
-        if self.accountID is None:
+        if self.profileId is None:
             self.__setPage(
                 AccountsPageLoggedOut(
                     self,
                     mainMenuCommand=self.mainMenu,
-                    setIdCommand=self.setAccountId,
+                    setIdCommand=self.setProfileId,
                     accountsPageCommand=self.accountsPage
                 )
             )
@@ -90,11 +90,11 @@ class App(ctk.CTk):
             self.__setPage(
                 AccountsPageLoggedIn(
                     self,
-                    accountId=self.accountID,
+                    profileId=self.profileId,
                     mainMenuCommand=self.mainMenu,
                     accountsPageCommand=self.accountsPage
                 )
             )
 
-    def setAccountId(self, id):
-        self.accountID = id
+    def setProfileId(self, id):
+        self.profileId = id

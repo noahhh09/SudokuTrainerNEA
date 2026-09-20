@@ -69,7 +69,7 @@ for id, puzzle, solution, difficulty in puzzles:
             highest_solved_difficulty = difficulty
             highest_solved_diff_id = id
             print(f"\r\033[KNew highest solved difficulty: {highest_solved_difficulty} (ID: {highest_solved_diff_id})", end="\n", flush=True)
-
+            # Thank you https://stackoverflow.com/questions/65330048/python3-how-to-clear-previous-prints-while-looping-flush
         solved += 1
 
 

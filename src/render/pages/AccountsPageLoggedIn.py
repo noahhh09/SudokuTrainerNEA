@@ -4,7 +4,7 @@ from typing import Any
 import customtkinter as ctk
 
 class AccountsPageLoggedIn(ctk.CTkFrame):
-    def __init__(self, master: Any, accountId: int, mainMenuCommand, accountsPageCommand):
+    def __init__(self, master: Any, profileId: int, mainMenuCommand, accountsPageCommand):
         super().__init__(master)
 
         mainMenuButton = ctk.CTkButton(self, text="Back to Main Menu", width=200, height=50, command=mainMenuCommand)
@@ -13,10 +13,10 @@ class AccountsPageLoggedIn(ctk.CTkFrame):
         conn = sqlite3.connect("sudoku.db")
         cursor = conn.cursor()
         cursor.execute("""
-            SELECT AccountName
-            FROM Users
-            WHERE UserID = ?
-        """, (accountId, ))
+            SELECT Name
+            FROM Profiles
+            WHERE ProfileID = ?
+        """, (profileId, ))
 
         name = cursor.fetchone()[0]
 

@@ -4,6 +4,8 @@ from typing import Any
 import bcrypt
 import customtkinter as ctk
 
+from src.render.components.ConfirmDeleteButton import ConfirmDeleteButton
+
 class AccountsPageLoggedOut(ctk.CTkFrame):
     def __init__(self, master: Any, mainMenuCommand, setIdCommand, accountsPageCommand):
         super().__init__(master)
@@ -11,134 +13,96 @@ class AccountsPageLoggedOut(ctk.CTkFrame):
         self.accountsPageCommand = accountsPageCommand
 
         self.grid_rowconfigure(1, weight=1)
-        self.grid_columnconfigure((0, 1), weight=1)
+        self.grid_columnconfigure((0,1,2), weight=1)
 
         mainMenuButton = ctk.CTkButton(self, text="Back to Main Menu", width=200, height=50, command=mainMenuCommand)
-        mainMenuButton.grid(row=0, column=0, sticky="w", padx=(5, 0), pady=10)
+        mainMenuButton.grid(row=0, column=0, sticky="w", padx=(5, 0), pady=10, columnspan=3)
 
         headerFont = ctk.CTkFont(size=24, weight="bold")
 
         # LOG IN 
-        loginFrame = ctk.CTkFrame(self, border_width=2)
-        loginFrame.grid(row=1, column=0, sticky="e", padx=10, pady=50)
+        self.loginFrame = ctk.CTkScrollableFrame(self, border_width=2, height=400)
+        self.loginFrame.grid(row=1, column=1, sticky="ew", padx=10, pady=10)
+        self.loginFrame.grid_columnconfigure(0, weight=1)
 
-        loginFrame.grid_columnconfigure((0, 1), weight=1)
+        selectProfile_header = ctk.CTkLabel(self.loginFrame, text="Select Profile", font=headerFont)
+        selectProfile_header.grid(row=0, column=0, padx=10, pady=10, sticky="ew", columnspan=2)
 
-        login_header = ctk.CTkLabel(loginFrame, text="Log In", font=headerFont)
-        login_header.grid(row=0, column=0, columnspan=2, padx=10, pady=10)
+        self.profileButtons: list[ctk.CTkBaseClass] = []
+        self.buildProfileSelector()
 
-        login_accountEntryLabel = ctk.CTkLabel(loginFrame, text="Account Name")
-        login_accountEntryLabel.grid(row=1, column=0, sticky="w", padx=10)
+        # CREATE PROFILE
+        createProfileFrame = ctk.CTkFrame(self, border_width=2)
+        createProfileFrame.grid(row=2, column=1, sticky="ew", padx=10, pady=10)
+        createProfileFrame.grid_columnconfigure(1, weight=1)
 
-        self.login_accountEntry = ctk.CTkEntry(loginFrame, width=240)
-        self.login_accountEntry.grid(row=1, column=1, sticky="e", padx=10)
+        createProfile_header = ctk.CTkLabel(createProfileFrame, text="Create Profile", font=headerFont)
+        createProfile_header.grid(row=0, column=0, columnspan=2, padx=10, pady=10)
 
-        login_passwordEntryLabel = ctk.CTkLabel(loginFrame, text="Password")
-        login_passwordEntryLabel.grid(row=2, column=0, sticky="w", padx=10)
+        createProfile_nameEntryLabel = ctk.CTkLabel(createProfileFrame, text="Profile Name")
+        createProfile_nameEntryLabel.grid(row=1, column=0, sticky="ew", padx=10)
 
-        self.login_passwordEntry = ctk.CTkEntry(loginFrame, width=240, show="*")
-        self.login_passwordEntry.grid(row=2, column=1, sticky="e", padx=10)
+        self.createProfile_nameEntry = ctk.CTkEntry(createProfileFrame, width=240)
+        self.createProfile_nameEntry.grid(row=1, column=1, sticky="ew", padx=10)
 
-        self.login_statusLabel = ctk.CTkLabel(loginFrame, text="", wraplength=196)
-        self.login_statusLabel.grid(row=3, column=0, columnspan=2)
+        self.createProfile_statusLabel = ctk.CTkLabel(createProfileFrame, text="", wraplength=256)
+        self.createProfile_statusLabel.grid(row=2, column=0, columnspan=2)
 
-        login_button = ctk.CTkButton(loginFrame, text="Log In", command=self.attemptLogin)
-        login_button.grid(row=4, column=0, columnspan=2)
+        createProfile_button = ctk.CTkButton(createProfileFrame, text="Create Profile", command=self.attemptSignup)
+        createProfile_button.grid(row=5, column=0, columnspan=2, pady=10)
 
-        # SIGN UP
-        signupFrame = ctk.CTkFrame(self, border_width=2)
-        signupFrame.grid(row=1, column=1, sticky="w", padx=10, pady=50)
+    def buildProfileSelector(self):
+        for widget in self.profileButtons:
+            widget.destroy()
 
-        signup_header = ctk.CTkLabel(signupFrame, text="Sign Up", font=headerFont)
-        signup_header.grid(row=0, column=0, columnspan=2, padx=10, pady=10)
-
-        signup_accountEntryLabel = ctk.CTkLabel(signupFrame, text="Account Name")
-        signup_accountEntryLabel.grid(row=1, column=0, sticky="w", padx=10)
-
-        self.signup_accountEntry = ctk.CTkEntry(signupFrame, width=240)
-        self.signup_accountEntry.grid(row=1, column=1, sticky="e", padx=10)
-
-        signup_passwordEntryLabel = ctk.CTkLabel(signupFrame, text="Password")
-        signup_passwordEntryLabel.grid(row=2, column=0, sticky="w", padx=10)
-
-        self.signup_passwordEntry = ctk.CTkEntry(signupFrame, width=240, show="*")
-        self.signup_passwordEntry.grid(row=2, column=1, sticky="e", padx=10)
-
-        signup_passwordVerifyLabel = ctk.CTkLabel(signupFrame, text="Verify Password")
-        signup_passwordVerifyLabel.grid(row=3, column=0, sticky="w", padx=10)
-
-        self.signup_passwordVerifyEntry = ctk.CTkEntry(signupFrame, width=240, show="*")
-        self.signup_passwordVerifyEntry.grid(row=3, column=1, sticky="e", padx=10)
-
-        self.signup_statusLabel = ctk.CTkLabel(signupFrame, text="", wraplength=196)
-        self.signup_statusLabel.grid(row=4, column=0, columnspan=2)
-
-        signup_button = ctk.CTkButton(signupFrame, text="Sign Up", command=self.attemptSignup)
-        signup_button.grid(row=5, column=0, columnspan=2)
-
-    def attemptLogin(self):
-        account = self.login_accountEntry.get()
-        enteredPassword = self.login_passwordEntry.get()
-
-        if not (3 <= len(account) <= 32) or not (8 <= len(enteredPassword) <= 128):
-            self.login_statusLabel.configure(text="Account name must be between 3 and 32 characters long. Password must be between 8 and 128.")
-            return
-
+        self.profileButtons = []
         conn = sqlite3.connect("sudoku.db")
         cur = conn.cursor()
-
         cur.execute("""
-            SELECT UserID, Salt, HashedPassword
-            FROM Users
-            WHERE AccountName = ?
-        """, (account,))
+            SELECT ProfileID, Name FROM Profiles
+        """)
 
-        data = cur.fetchone()
-        if data is None:
-            self.login_statusLabel.configure(text="Incorrect username/password.") # Good for privacy to not reveal WHAT was specifically wrong. (since it reveals an account exists otherwise)
-            return
+        profiles = cur.fetchall()
+        for i, (id, name) in enumerate(profiles):
+            profileButton = ctk.CTkButton(self.loginFrame, text=name, command=lambda id=id: self.selectProfile(id))
+            profileButton.grid(row=i+1, column=0, pady=10, padx=(10,5), sticky="ew")
 
-        id, salt, hashedPassword = data
+            deleteButton = ConfirmDeleteButton(self.loginFrame, text="Delete", fg_color="#aa0000", command=lambda id=id: self.deleteProfile(id))
+            deleteButton.grid(row=i+1, column=1, pady=10, padx=(5,10), sticky="ew")
 
-        enteredBytes = enteredPassword.encode('utf-8')
-        enteredHashed = bcrypt.hashpw(enteredBytes, salt)
+            self.profileButtons.append(profileButton)
+            self.profileButtons.append(deleteButton)
 
-        if enteredHashed != hashedPassword:
-            self.login_statusLabel.configure(text="Incorrect username/password.") # Good for privacy to not reveal WHAT was specifically wrong. (since it reveals an account exists otherwise)
-            return
 
+    def selectProfile(self, id):
         self.setIdCommand(id)
         self.accountsPageCommand()
 
+    def deleteProfile(self, id):
+        conn = sqlite3.connect("sudoku.db")
+
+        conn.execute("""
+            DELETE FROM Profiles
+            WHERE ProfileID = ?
+        """, (id,))
+
+        conn.commit()
         conn.close()
 
+        self.buildProfileSelector()
 
     def attemptSignup(self):
-        name = self.signup_accountEntry.get()
-        password = self.signup_passwordEntry.get()
-        verify = self.signup_passwordVerifyEntry.get()
+        name = self.createProfile_nameEntry.get()
 
-        if  not (3 <= len(name) <= 32) or not (8 <= len(password) <= 128) or not (8 <= len(verify) <= 128):
-            self.signup_statusLabel.configure(text="Name must be between 3 and 32 characters long. Password must be between 8 and 128.")
+        if not (1 <= len(name) <= 32):
+            self.createProfile_statusLabel.configure(text="Name must be between 1 and 32 characters long.")
             return
-
-        elif password != verify:
-            self.signup_statusLabel.configure(text="Passwords do not match.")
-            return
-
-        # Thank you https://www.geeksforgeeks.org/python/hashing-passwords-in-python-with-bcrypt/
-        bytes = password.encode('utf-8')
-
-        salt = bcrypt.gensalt()
-        hashed = bcrypt.hashpw(bytes, salt)
 
         conn = sqlite3.connect("sudoku.db")
         conn.execute("""
-            CREATE TABLE IF NOT EXISTS Users ( 
-                UserID INTEGER PRIMARY KEY AUTOINCREMENT, 
-                AccountName TEXT NOT NULL UNIQUE,
-                Salt BLOB NOT NULL, 
-                HashedPassword BLOB NOT NULL, 
+            CREATE TABLE IF NOT EXISTS Profiles ( 
+                ProfileID INTEGER PRIMARY KEY AUTOINCREMENT, 
+                Name TEXT NOT NULL UNIQUE,
                 CreatedAt TIMESTAMP DEFAULT (unixepoch())
             );
         """) # Thank you https://stackoverflow.com/questions/11556546/sqlite-storing-default-timestamp-as-unixepoch
@@ -146,17 +110,28 @@ class AccountsPageLoggedOut(ctk.CTkFrame):
         cursor = conn.cursor()
         try:
             cursor.execute("""
-                INSERT INTO Users (AccountName, Salt, HashedPassword) VALUES (?, ?, ?)
-            """, (name, salt, hashed))
-        except sqlite3.IntegrityError:
-            self.signup_statusLabel.configure(text="This account name is already taken.")
-        except sqlite3.Error:
-            self.signup_statusLabel.configure(text="An unexpected error occurred.")
+                INSERT INTO Profiles (Name) VALUES (?)
+            """, (name,))
 
-        conn.commit()
-        
-        id = cursor.lastrowid    
-        self.setIdCommand(id)
+            conn.commit()
+            id = cursor.lastrowid
+            self.setIdCommand(id)
+            
+        except sqlite3.IntegrityError:
+            self.createProfile_statusLabel.configure(text="This account name is already taken.")
+
+            cursor.execute("""
+                SELECT ProfileID
+                FROM Profiles
+                WHERE Name = ?
+            """, (name,))
+
+            [id] = cursor.fetchone()
+            self.setIdCommand(id)
+
+        except sqlite3.Error:
+            self.createProfile_statusLabel.configure(text="An unexpected error occurred.")
+
         self.accountsPageCommand()
 
         conn.close()
