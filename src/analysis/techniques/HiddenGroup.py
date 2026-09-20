@@ -46,20 +46,7 @@ class HiddenGroup(Technique):
 
         # Check each unit.
         for unit in units:
-            cells = enumerate(unit.cells) # Add relative position to each cell so that it can be referred to later.
-
-            # Count the number of times each candidate digit appears in the unit.
-            digitOccurrences: dict[int, list[int]] = {}
-            for i, cell in cells:
-                for digit in cell.getEffectiveCandidates():
-                    digitOccurrences.setdefault(digit, [])
-                    digitOccurrences[digit].append(i)
-
-            digitOccurrences = {
-                digit : occurrences 
-                for digit, occurrences in digitOccurrences.items() 
-                if 0 < len(occurrences) <= degree # premature optimisation, since if a cell has more than degree candidates, it cant form that hidden group anyway
-            }
+            digitOccurrences = BoardUtils.findCandidateDigitOccurrences(unit, upperBound=degree)
 
             for combo in itertools.combinations(digitOccurrences.items(), degree):
                 union: set[int] = set()

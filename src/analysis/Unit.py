@@ -31,5 +31,8 @@ class Unit:
     def __str__(self) -> str:
         return f"{self.unitType.name} {self.unitIndex}"
 
+    def readableStr(self) -> str:
+        return f"{self.unitType.name} {self.unitIndex + 1}"
+
     def __repr__(self) -> str:
         return self.__str__()

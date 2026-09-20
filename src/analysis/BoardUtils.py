@@ -83,3 +83,37 @@ def getAllUnits(board: BoardState) -> list[Unit]:
         units.append(Unit(UnitType.Block, k, board.getBlock(k)))
 
     return units
+
+def getUnitsOfKind(board: BoardState, type: UnitType):
+    units: list[Unit] = []
+
+    match type:
+        case UnitType.Row:
+            for i in range(9):
+                units.append(Unit(UnitType.Row, i, board.getRow(i)))
+        case UnitType.Column:
+            for j in range(9):
+                units.append(Unit(UnitType.Column, j, board.getColumn(j)))
+        case UnitType.Block:
+            for k in range(9):
+                units.append(Unit(UnitType.Block, k, board.getBlock(k)))
+
+    return units
+        
+def findCandidateDigitOccurrences(unit: Unit, upperBound: int = 9):
+    cells = enumerate(unit.cells) # Add relative position to each cell so that it can be referred to later.
+    digitOccurrences: dict[int, set[int]] = {}
+
+    for i, cell in cells:
+        for digit in cell.getEffectiveCandidates():
+            digitOccurrences.setdefault(digit, set())
+            digitOccurrences[digit].add(i)
+
+    if upperBound < 9:
+        digitOccurrences = {
+            digit : occurrences 
+            for digit, occurrences in digitOccurrences.items() 
+            if len(occurrences) <= upperBound
+        }
+
+    return digitOccurrences
