@@ -7,10 +7,10 @@ from src.analysis.Technique import Technique
 from src.core.BoardState import BoardState
 from src.core.Move import Move, ValueChangeMove, CandidateChangeMove, EliminationChangeMove
 from src.core.Game import Game
-from src.render.components.SudokuFeed import SudokuFeed
+from src.render.components.gameplay.SudokuFeed import SudokuFeed
 from src.render.components.core.SudokuControls import EditState, SudokuControls
 from src.render.components.core.SudokuGrid import SudokuGrid
-from src.render.components.SudokuHintMenu import SudokuHintMenu
+from src.render.components.gameplay.SudokuHintMenu import SudokuHintMenu
 
 class SudokuPage(ctk.CTkFrame):
     def __init__(self, master: Any, boardState: BoardState, mainMenuCommand, **kwargs):
