@@ -32,6 +32,9 @@ class SudokuPage(ctk.CTkFrame):
         self.printBoardStateTODORemove = ctk.CTkButton(self, text="Print Current State", width=200, height=50, command=lambda: print("Snapshot", self.game.boardState.serialise()))
         self.printBoardStateTODORemove.grid(row=0, column=1, sticky="w", padx=(5, 0), pady=10)
 
+        self.advanceTODORemove = ctk.CTkButton(self, text="Advance", width=200, height=50, command=self.advance)
+        self.advanceTODORemove.grid(row=0, column=2, sticky="w", padx=(5, 0), pady=10)
+
         self.hintsFrame = ctk.CTkFrame(self, bg_color="transparent")
         self.hintsFrame.grid(row=1, column=1, sticky="nsew", padx=5, pady=5, rowspan=2)
         self.hintsFrame.grid_columnconfigure(0, weight=1) # AI generated (line only) - https://chatgpt.com/share/6a95e88c-7674-83eb-a59f-7a501973d802
@@ -90,3 +93,12 @@ class SudokuPage(ctk.CTkFrame):
 
         self.sudokuGrid.redraw()
         self.feed.repopulate(self.game.boardState)
+
+    def advance(self):
+        for type in ALL_TECHNIQUE_TYPES:
+            available = type.findAvailable(self.game.boardState)
+            if len(available) > 0:
+                t = available[0]
+                self.applyTechnique(t)
+                print(type.__name__)
+                break
