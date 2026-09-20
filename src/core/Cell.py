@@ -78,7 +78,7 @@ class Cell:
 
     def getEffectiveCandidates(self) -> set[int]:
         if self.getValue() is not None:
-            return set().copy()
+            return set()
             
         # Returns candidates ∩ (eliminated)'
-        return set([candidate for candidate in self.__candidates if candidate not in self.__eliminatedCandidates])
+        return self.__candidates - self.__eliminatedCandidates
