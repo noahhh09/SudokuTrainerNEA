@@ -16,7 +16,7 @@ def boards_match(board1: BoardState, board2: BoardState) -> bool:
 conn = sqlite3.connect("sudoku.db")
 cur = conn.cursor()
 cur = cur.execute("""
-    SELECT PuzzleID, SerialisedBoard, solution, difficulty
+    SELECT PuzzleID, SerialisedBoard, SerialisedSolution, difficulty
     FROM Puzzles
     WHERE difficulty > 0
     ORDER BY difficulty ASC
