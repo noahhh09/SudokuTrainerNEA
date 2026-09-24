@@ -6,6 +6,7 @@ import customtkinter as ctk
 from src.analysis.Technique import Technique
 from src.core.BoardState import BoardState
 from src.explanation.ExplanationFactory import ExplanationFactory
+from src.explanation.Step import Step
 from src.explanation.TechniqueExplanation import TechniqueExplanation
 from src.render.components.core.SudokuGrid import SudokuGrid
 
@@ -72,6 +73,11 @@ class TechniqueLearningPage(ctk.CTkFrame):
 
         previous = self.explanation.getPrevious()
         previous.apply(self.sudokuGrid, self.infoLabel)
+
+        activeStack = self.explanation.getActiveStack()
+        while not activeStack.isEmpty():
+            step: Step = activeStack.pop()
+            step.apply(self.sudokuGrid, self.infoLabel)
 
     def nextStep(self):
         current = self.explanation.getCurrent()
