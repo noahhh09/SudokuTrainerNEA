@@ -54,6 +54,10 @@ class Cell:
 
         self.__candidates.remove(value)
 
+    def removeCandidates(self, values: set[int]):
+        for value in values:
+            self.removeCandidate(value)
+
     def getCandidates(self) -> set[int]:
         return self.__candidates.copy()
 

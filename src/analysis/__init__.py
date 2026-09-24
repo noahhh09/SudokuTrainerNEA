@@ -8,3 +8,14 @@ from src.analysis.techniques.XWing import XWing
 
 # Order by "relative simpleness" where 0th element is most simple.
 ALL_TECHNIQUE_TYPES: list[type[Technique]] = [NakedSingle, HiddenSingle, NakedPair, HiddenPair, PointingGroup, NakedTriple, HiddenTriple, XWing]
+
+__all__ = [
+    "NakedSingle",
+    "HiddenSingle",
+    "NakedPair",
+    "HiddenPair",
+    "PointingGroup",
+    "NakedTriple",
+    "HiddenTriple",
+    "XWing"
+]

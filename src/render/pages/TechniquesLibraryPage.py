@@ -18,20 +18,25 @@ class TechniquesLibraryPage(ctk.CTkFrame):
         self.mainMenuButton = ctk.CTkButton(self, text="Back to Main Menu", width=200, height=50, command=mainMenuCommand)
         self.mainMenuButton.place(relx=0.01, rely=0.05, anchor="w")
 
+        self.statusLabel = ctk.CTkLabel(self, text="")
+        self.statusLabel.place(relx=0.5, rely=0.05, anchor="center")
+
         self.techniquesGrid = ctk.CTkScrollableFrame(self)
 
         for i, technique in enumerate(ALL_TECHNIQUE_TYPES):
-            widget = TechniqueWidget(self.techniquesGrid, technique=technique, loadBoardStateCommand=loadBoardStateCommand, techniquePageCommand=techniquePageCommand)
+            widget = TechniqueWidget(self.techniquesGrid, technique=technique, loadBoardStateCommand=loadBoardStateCommand, techniquePageCommand=techniquePageCommand, statusLabel=self.statusLabel)
             widget.grid(column=i % MAX_PER_ROW, row=i // MAX_PER_ROW, padx=(0 if i % MAX_PER_ROW == 0 else 5, 5), pady=(5, 5))
 
         self.techniquesGrid.place(relx=0.5, rely=0.1, relwidth=1, relheight=0.8, anchor="n")
 
 
 class TechniqueWidget(ctk.CTkFrame):
-    def __init__(self, master, technique: type[Technique], loadBoardStateCommand, techniquePageCommand, **kwargs): # I just want to say the type[Technique] thing is my coolest discovery yet.
+    def __init__(self, master, technique: type[Technique], loadBoardStateCommand, techniquePageCommand, statusLabel: ctk.CTkLabel, **kwargs): # I just want to say the type[Technique] thing is my coolest discovery yet.
         super().__init__(master, height=300, **kwargs)
 
         self.technique = technique
+        self.statusLabel = statusLabel
+        self.techniquePageCommand = techniquePageCommand
         self.loadBoardStateCommand = loadBoardStateCommand
 
         self.nameLabel = ctk.CTkLabel(self, text=technique.displayName, font=ctk.CTkFont(size=24, weight="bold"), wraplength=168)
@@ -40,7 +45,7 @@ class TechniqueWidget(ctk.CTkFrame):
         self.descriptionLabel = ctk.CTkLabel(self, text=technique.description, wraplength=168, font=ctk.CTkFont(size=14))
         self.descriptionLabel.place(relx=0.5, rely=0.3, anchor="n")
 
-        self.explainButton = ctk.CTkButton(self, text="Learn", command=lambda: techniquePageCommand(technique))
+        self.explainButton = ctk.CTkButton(self, text="Learn", command=self.explainTechnique)
         self.explainButton.place(relx=0.5, rely=0.8, anchor="center")
 
         self.practiceButton = ctk.CTkButton(self, text="Practice", command=self.practiceTechnique)
@@ -56,6 +61,13 @@ class TechniqueWidget(ctk.CTkFrame):
 
         self.countLabel = ctk.CTkLabel(self, text=f"{df["Count"].iloc[0]}", wraplength=168, font=ctk.CTkFont(size=10,slant="italic"))
         self.countLabel.place(relx=0.5, rely=0.75, anchor="s")
+
+    def explainTechnique(self):
+        try:
+            self.techniquePageCommand(self.technique)
+        except NotImplementedError as err:
+            self.statusLabel.configure(text="Sorry, this technique cannot be learned right now.")
+            raise err
 
     def practiceTechnique(self):
         conn = sqlite3.connect("sudoku.db")

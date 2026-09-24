@@ -32,9 +32,8 @@ class SudokuGrid(ctk.CTkFrame):
 
         self.redraw()
 
-    def highlightUnit(self, unit: Unit, colour: str):
-        for i in range(9):
-            row, col = unit.getBoardPosition(i)
+    def highlightCells(self, cells: list[tuple[int, int]], colour: str):
+        for row, col in cells:
             self.sudokuCells[row][col].highlight(colour)
 
     def selectCell(self, row, col):
