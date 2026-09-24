@@ -1,6 +1,6 @@
 from src.analysis.techniques.NakedSingle import NakedSingle
 from src.core.BoardState import BoardState
-from src.core.Move import ValueChangeMove
+from src.core.Move import EliminationChangeMove, ValueChangeMove
 from src.explanation.Step import *
 from src.explanation.TechniqueExplanation import TechniqueExplanation
 
@@ -14,8 +14,10 @@ class NakedSingleExplanation(TechniqueExplanation):
         digit = self.technique.digit
 
         units = BoardUtils.getMemberUnits(board, *self.technique.pos)
-        positions = [[unit.getBoardPosition(i) for i in range(9)] for unit in units]
-        positions = positions[0] + positions[1] + positions[2]
+        memberUnitPositions = [[unit.getBoardPosition(i) for i in range(9)] for unit in units]
+        memberUnitPositions = memberUnitPositions[0] + memberUnitPositions[1] + memberUnitPositions[2]
+
+        eliminations: list[Move] = [EliminationChangeMove(*self.technique.pos, x, add=True) for x in ({1,2,3,4,5,6,7,8,9} - {digit})]
 
         allInstances = NakedSingle.findAvailable(board) 
         otherNakedSinglePositions: list[tuple[int, int]] = []
@@ -25,19 +27,22 @@ class NakedSingleExplanation(TechniqueExplanation):
                 continue
 
             otherNakedSinglePositions.append(instance.pos)
-
         return [
             ShowText("A Naked Single occurs when a cell has only one single candidate remaining, meaning it has to be that value."),
-            HighlightCells("Look at this position.", [self.technique.pos]),
+            HighlightCells("Lets look at this cell.", [self.technique.pos]),
             Steps([
-                HighlightCells("", positions),
-                HighlightCells(f"Look at the wider units this cell is a part of. Notice how the digits 1-9 except for {digit} all appear somewhere in these units. What might this mean for this cell?", [self.technique.pos], "yellow")
+                HighlightCells("", memberUnitPositions),
+                HighlightCells(f"Look at the wider units this cell is a part of (as highlighted). Notice how the digits 1-9 except for {digit} all appear at least once in the highlighted units? What might this mean for the candidates in the main cell?", [self.technique.pos], "yellow")
             ]),
-            PopulateCandidatesInCells(f"That means that this cell can only have the digit {digit} as a candidate.", [self.technique.pos]),
-            UpdateCellValue(f"Since the digit {digit} is the only candidate, this number must be in this cell.", *self.technique.pos, digit),
             Steps([
-                UpdateCellValue("", *self.technique.pos, None),
-                PopulateAllCandidates(""),
+                PopulateEveryCandidateNumberInCells("", [self.technique.pos]),
+                ApplyMoves("", eliminations),
+                HighlightCells(f"In terms of candidates, notice that means that each possible candidate digit apart from {digit} can be eliminated?", [self.technique.pos])
+            ]),
+            PopulateLogicalCandidatesInCells(f"That means that this cell can only have the digit {digit} as a candidate.", [self.technique.pos]),
+            ApplyMove(f"Since the digit {digit} is the only candidate, and this cell will have to be filled, the digit {digit} must be in this cell.", ValueChangeMove(*self.technique.pos, digit)),
+            Steps([
+                PopulateAllLogicalCandidates(""),
                 HighlightCells("Finding Naked Singles: Naked Singles are easy to spot once you are sure of all the candidates in one cell.", otherNakedSinglePositions),
             ])
         ]
