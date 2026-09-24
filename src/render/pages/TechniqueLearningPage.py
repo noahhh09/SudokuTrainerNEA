@@ -75,7 +75,8 @@ class TechniqueLearningPage(ctk.CTkFrame):
 
     def nextStep(self):
         current = self.explanation.getCurrent()
-        current.undo(self.sudokuGrid, self.infoLabel)
+        if not current.stackable:
+            current.undo(self.sudokuGrid, self.infoLabel)
 
         next = self.explanation.getNext()
         next.apply(self.sudokuGrid, self.infoLabel)
