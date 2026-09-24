@@ -43,7 +43,7 @@ class NakedSingleExplanation(TechniqueExplanation):
             ApplyMove(f"Since the digit {digit} is the only candidate, and this cell will have to be filled, the digit {digit} must be in this cell.", ValueChangeMove(*self.technique.pos, digit)),
             Steps([
                 PopulateAllLogicalCandidates(""),
-                HighlightCells("Finding Naked Singles: Naked Singles are easy to spot once you are sure of all the candidates in one cell.", otherNakedSinglePositions),
+                HighlightCells("Finding Naked Singles: Naked Singles are easy to spot once you are sure of all the candidates in one cell. The cell will simply have one candidate only.", otherNakedSinglePositions),
             ])
         ]
 
