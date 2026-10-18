@@ -15,7 +15,7 @@ class ConfirmDeleteButton(CTkButton):
         else:
             self.configure(text="Confirm")
             self.awaiting_confirmation = True
-            self.after(5000, self.reset_button)
+            self.after(2000, self.reset_button)
 
     def reset_button(self):
         if self.awaiting_confirmation:
