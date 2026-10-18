@@ -1,9 +1,11 @@
 from src.analysis.Technique import Technique
 from src.analysis.techniques.HiddenSingle import HiddenSingle
+from src.analysis.techniques.NakedGroup import NakedGroup, NakedPair, NakedTriple
 from src.analysis.techniques.NakedSingle import NakedSingle
 from src.analysis.techniques.PointingGroup import PointingGroup
 from src.core.BoardState import BoardState
 from src.explanation.HiddenSingleExplanation import HiddenSingleExplanation
+from src.explanation.NakedGroupExplanation import NakedGroupExplanation
 from src.explanation.NakedSingleExplanation import NakedSingleExplanation
 from src.explanation.PointingGroupExplanation import PointingGroupExplanation
 from src.explanation.TechniqueExplanation import TechniqueExplanation
@@ -13,7 +15,10 @@ class ExplanationFactory:
     techTypeToExplanationType: dict[type[Technique], type[TechniqueExplanation]] = {
         NakedSingle: NakedSingleExplanation,
         HiddenSingle: HiddenSingleExplanation,
-        PointingGroup: PointingGroupExplanation
+        PointingGroup: PointingGroupExplanation,
+        NakedGroup: NakedGroupExplanation,
+        NakedPair: NakedGroupExplanation,
+        NakedTriple: NakedGroupExplanation
     }
 
     @classmethod
