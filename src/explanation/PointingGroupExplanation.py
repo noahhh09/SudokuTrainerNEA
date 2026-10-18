@@ -15,7 +15,7 @@ class PointingGroupExplanation(TechniqueExplanation):
         affectedType = self.technique.affectedUnit.unitType.name
 
         return [
-            ShowText("A pointing group is when candidates are confined to a row/column inside a block, and so other instances of the candidate in that row or column can be ruled out."),
+            ShowText("A pointing technique is when candidates are confined to a row/column inside a block, and so other instances of the candidate in that row or column can be ruled out."),
             HighlightCells(f"Where can the digit {digit} be placed in the highlighted block?", self.technique.causalBlockUnit),
             Steps([
                 ApplyMoves("", [CandidateChangeMove(row, col, candidateNumber=digit, add=True) for row, col in self.technique.causalPositions]),

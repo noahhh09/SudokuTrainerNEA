@@ -22,4 +22,4 @@ class ExplanationFactory:
         if techniqueType in cls.techTypeToExplanationType:
             return cls.techTypeToExplanationType[techniqueType](technique, board)
         
-        raise NotImplementedError(f"Technique {techniqueType.__name__} not supported for explanations yet! Did you check the mappings in TechniqueExplanation.py?")
+        raise NotImplementedError(f"Technique {techniqueType.__name__} not supported for explanations yet! Did you check the mappings in ExplanationFactory.py?")
