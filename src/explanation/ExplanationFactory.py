@@ -4,6 +4,7 @@ from src.analysis.techniques.HiddenSingle import HiddenSingle
 from src.analysis.techniques.NakedGroup import NakedGroup, NakedPair, NakedTriple
 from src.analysis.techniques.NakedSingle import NakedSingle
 from src.analysis.techniques.PointingGroup import PointingGroup
+from src.analysis.techniques.XWing import XWing
 from src.core.BoardState import BoardState
 from src.explanation.HiddenGroupExplanation import HiddenGroupExplanation
 from src.explanation.HiddenSingleExplanation import HiddenSingleExplanation
@@ -11,6 +12,7 @@ from src.explanation.NakedGroupExplanation import NakedGroupExplanation
 from src.explanation.NakedSingleExplanation import NakedSingleExplanation
 from src.explanation.PointingGroupExplanation import PointingGroupExplanation
 from src.explanation.TechniqueExplanation import TechniqueExplanation
+from src.explanation.XWingExplanation import XWingExplanation
 
 # Thank you https://stackoverflow.com/a/66394022 for help with the implementation.
 class ExplanationFactory:
@@ -23,7 +25,8 @@ class ExplanationFactory:
         NakedTriple: NakedGroupExplanation,
         HiddenGroup: HiddenGroupExplanation,
         HiddenPair: HiddenGroupExplanation,
-        HiddenTriple: HiddenGroupExplanation
+        HiddenTriple: HiddenGroupExplanation,
+        XWing: XWingExplanation
     }
 
     @classmethod

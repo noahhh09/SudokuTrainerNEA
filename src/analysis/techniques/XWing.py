@@ -16,6 +16,7 @@ class XWing(Technique):
         self.baseDirection = baseDirection
         self.baseUnits = baseUnits
         self.coverUnits = coverUnits
+        self.causalPositions = [base.getBoardPosition(cover.unitIndex) for cover in self.coverUnits for base in self.baseUnits]
         self.digit = digit
 
     def identity(self) -> str:
