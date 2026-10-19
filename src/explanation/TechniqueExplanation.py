@@ -32,3 +32,15 @@ class TechniqueExplanation:
     def getNext(self):
         self.index = min(self.index + 1, len(self.steps) - 1)
         return self.steps[self.index]
+
+    def _getDigitsString(self, digits: set[int]):
+        digitsString = ""
+        for i, digit in enumerate(digits):
+            if i == len(digits) - 1:
+                digitsString += " and "
+            elif i > 0:
+                digitsString += ", "
+
+            digitsString += f"{digit}"
+
+        return digitsString

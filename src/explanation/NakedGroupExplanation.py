@@ -10,15 +10,8 @@ class NakedGroupExplanation(TechniqueExplanation):
         super().__init__(technique, board)
 
     def getSteps(self, board: BoardState) -> list[Step]:
-        digits = self.technique.candidateUnion.copy()
-        digitsString = ""
-        for i, digit in enumerate(digits):
-            if i == len(digits) - 1:
-                digitsString += " and "
-            elif i > 0:
-                digitsString += ", "
-
-            digitsString += f"{digit}"
+        digits = self.technique.candidateUnion
+        digitsString = self._getDigitsString(digits)
 
         causalBoardPositions = [self.technique.unit.getBoardPosition(i) for i in self.technique.causalPositions]
 
