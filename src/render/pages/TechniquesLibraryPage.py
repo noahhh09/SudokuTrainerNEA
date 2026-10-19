@@ -54,8 +54,11 @@ class TechniqueWidget(ctk.CTkFrame):
         conn = sqlite3.connect("sudoku.db")
         df = pd.read_sql_query("""
             SELECT COUNT(*) AS Count
-            FROM PuzzleTags
-            WHERE Tag = ?
+            FROM PuzzleTags Tag1
+            INNER JOIN PuzzleTags Tag2
+                ON Tag1.PuzzleID = Tag2.PuzzleID
+            WHERE Tag1.Tag = ?
+            AND Tag2.Tag = 'solvable'
         """, conn, params=(self.technique.__name__, ))
         conn.close()
 
@@ -74,9 +77,12 @@ class TechniqueWidget(ctk.CTkFrame):
         df = pd.read_sql_query("""
         SELECT P.PuzzleID, P.SerialisedBoard, P.clues, P.difficulty
         FROM Puzzles P
-        INNER JOIN PuzzleTags
-            ON P.PuzzleID = PuzzleTags.PuzzleID
-        WHERE PuzzleTags.Tag = ?
+        INNER JOIN PuzzleTags Tag1
+            ON P.PuzzleID = Tag1.PuzzleID
+        INNER JOIN PuzzleTags Tag2
+            ON P.PuzzleID = Tag2.PuzzleID
+        WHERE Tag1.Tag = ?
+        AND Tag2.Tag = 'solvable'
 """, conn, params=(self.technique.__name__,))
         conn.close()
 

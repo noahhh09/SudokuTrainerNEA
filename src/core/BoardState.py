@@ -35,6 +35,14 @@ class BoardState:
 
         return (row, col)
 
+    def isFull(self):
+        for i in range(9):
+            for j in range(9):
+                if self.getCell(i, j).getValue() is None:
+                    return False
+
+        return True
+
     """
     Returns the respective serialised string for the currently stored BoardState. 
     """

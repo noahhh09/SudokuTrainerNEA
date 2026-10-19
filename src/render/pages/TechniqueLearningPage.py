@@ -25,8 +25,8 @@ class TechniqueLearningPage(ctk.CTkFrame):
                 FROM Puzzles
                 INNER JOIN PuzzleTags
                     ON Puzzles.PuzzleID = PuzzleTags.PuzzleID
-                WHERE PuzzleTags.Tag = ?
-            """, (techniqueId,))
+                WHERE PuzzleTags.Tag = ? 
+            """, (techniqueId,)) # Doesn't matter if the board is solvable or not. Only showing this instance of a technique, which we know does exist.
 
             found = cur.fetchall()
             randomIndex = random.randint(0, len(found) - 1)

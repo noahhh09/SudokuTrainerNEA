@@ -58,6 +58,9 @@ class MainMenuPage(ctk.CTkFrame):
         df = pd.read_sql_query("""
         SELECT P.PuzzleID, P.SerialisedBoard, P.clues, P.difficulty
         FROM Puzzles P
+        INNER JOIN PuzzleTags
+            ON P.PuzzleID = PuzzleTags.PuzzleID
+        WHERE Tag = 'solvable'
 """, conn)
 
         if df.empty:
