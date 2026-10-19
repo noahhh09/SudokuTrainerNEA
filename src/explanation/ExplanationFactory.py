@@ -1,9 +1,11 @@
 from src.analysis.Technique import Technique
+from src.analysis.techniques.HiddenGroup import HiddenGroup, HiddenPair, HiddenTriple
 from src.analysis.techniques.HiddenSingle import HiddenSingle
 from src.analysis.techniques.NakedGroup import NakedGroup, NakedPair, NakedTriple
 from src.analysis.techniques.NakedSingle import NakedSingle
 from src.analysis.techniques.PointingGroup import PointingGroup
 from src.core.BoardState import BoardState
+from src.explanation.HiddenGroupExplanation import HiddenGroupExplanation
 from src.explanation.HiddenSingleExplanation import HiddenSingleExplanation
 from src.explanation.NakedGroupExplanation import NakedGroupExplanation
 from src.explanation.NakedSingleExplanation import NakedSingleExplanation
@@ -18,7 +20,10 @@ class ExplanationFactory:
         PointingGroup: PointingGroupExplanation,
         NakedGroup: NakedGroupExplanation,
         NakedPair: NakedGroupExplanation,
-        NakedTriple: NakedGroupExplanation
+        NakedTriple: NakedGroupExplanation,
+        HiddenGroup: HiddenGroupExplanation,
+        HiddenPair: HiddenGroupExplanation,
+        HiddenTriple: HiddenGroupExplanation
     }
 
     @classmethod
