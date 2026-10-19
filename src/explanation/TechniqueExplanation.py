@@ -19,7 +19,7 @@ class TechniqueExplanation:
 
     def getActiveStack(self) -> Stack: # Allows stacked moves to be properly undone. For example, if a highlight overrides a stack - it wouldn't normaly be fixed when undoing. This just reapplies everything from the stacked moves, in its original order.
         stack = Stack()
-        localIndex = self.index - (0 if self.steps[self.index].stackable else 1) # Make it so that if the current move is stackable, that that doesn't get overrided too.
+        localIndex = self.index # Make it so that if the current move is stackable, that that doesn't get overrided too.
         while localIndex > 0 and self.steps[localIndex].stackable:
             stack.push(self.steps[localIndex])
             localIndex -= 1
