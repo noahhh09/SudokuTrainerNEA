@@ -8,7 +8,7 @@ class Technique:
     def __init__(self, moves: list[Move]) -> None:
         self.moves = moves
 
-    @classmethod
+    @classmethod # Similar to static methods, but allows class variables to be accessed (useful for multi-degree classes, like NakedGroup). https://www.geeksforgeeks.org/python/classmethod-in-python/
     def findAvailable(cls, state: BoardState) -> list[Technique]:
         raise NotImplementedError()
 
