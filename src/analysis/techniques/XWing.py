@@ -52,7 +52,7 @@ class XWing(Technique):
                 if len(occurrences) != 2:
                     continue # Definitely not gonna form an X-Wing
 
-                for j in range(i + 1, 9):          
+                for j in range(i + 1, 9): # We only need to check the FOLLOWING units, as this unit would've already been picked up by previous searches.
                     if digit not in occurrencesByRow[j]:
                         continue
 

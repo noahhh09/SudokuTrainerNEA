@@ -143,12 +143,14 @@ def getUnitsOfKind(board: BoardState, type: UnitType):
                 units.append(Unit(UnitType.Block, k, board.getBlock(k)))
 
     return units
-        
-def findCandidateDigitOccurrences(unit: Unit, upperBound: int = 9):
-    cells = enumerate(unit.cells) # Add relative position to each cell so that it can be referred to later.
+
+"""
+    Returns a list of the relative positions where each candidate digit appears in a unit.
+"""
+def findCandidateDigitOccurrences(unit: Unit, upperBound: int = 9) -> dict[int, set[int]]:
     digitOccurrences: dict[int, set[int]] = {}
 
-    for i, cell in cells:
+    for i, cell in enumerate(unit.cells):
         for digit in cell.getEffectiveCandidates():
             digitOccurrences.setdefault(digit, set())
             digitOccurrences[digit].add(i)

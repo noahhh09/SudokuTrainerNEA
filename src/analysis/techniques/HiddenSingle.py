@@ -35,36 +35,26 @@ class HiddenSingle(Technique):
         units = BoardUtils.getAllUnits(candidateState)
 
         for unit in units:
-            hiddenSingles = HiddenSingle._findHiddenSinglesInUnit(unit)
-            for digit, index in hiddenSingles.items():
-                row, col = unit.getBoardPosition(index)
-                tech = HiddenSingle([ValueChangeMove(row, col, digit)], unit, (row, col), digit)
-                found.append(tech)
+            for digit in range(1, 10):
+                index = None
 
-        return found # Known "bug": might contain duplicates. Say if a block and a column share a hidden single. Whatever.
+                for i in range(9):
+                    candidates = unit.cells[i].getEffectiveCandidates()
 
-    # Returns the RELATIVE POSITIONS of single occurrences of a candidate DIGIT in a unit.
-    # Dict: [digit, position]
-    @classmethod
-    def _findHiddenSinglesInUnit(cls, unit: Unit) -> dict[int, int]:
-        singleOccurences: dict[int, int] = {}
+                    if digit in candidates:
+                        if index is None:
+                            index = i
+                        else:
+                            index = None # Because this would only happen if position has been updated before, hence this is NOT a Hidden Single.
+                            break
 
-        for digit in range(1, 10):
-            position = None
+                if index is not None and len(unit.cells[index].getEffectiveCandidates()) > 1: # Second check ensures no naked singles are detected.
+                    row, col = unit.getBoardPosition(index)
+                    move = ValueChangeMove(row, col, digit)
+                    technique = HiddenSingle([move], unit, (row, col), digit)
+                    found.append(technique)
 
-            for i in range(9):
-                candidates = unit.cells[i].getEffectiveCandidates()
-                if digit in candidates:
-                    if position is None:
-                        position = i
-                    else:
-                        position = None
-                        break # Since this means it's repeated..
-
-            if position is not None and len(unit.cells[position].getEffectiveCandidates()) > 1: # Avoids naked single detection.
-                singleOccurences[digit] = position
-
-        return singleOccurences
+        return found
 
     def __str__(self) -> str:
         return f"{self.__class__.__name__}({self.causalUnit.unitType.name} {self.causalUnit.unitIndex} {self.moves})"

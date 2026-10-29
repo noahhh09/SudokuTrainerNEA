@@ -79,7 +79,7 @@ class NakedTriple(NakedGroup):
 
 # Returns [(relPositions, candidateValues)]
 def _findNakedGroups(cells: list[tuple[int, Cell]], size: int) -> list[tuple[list[int], set[int]]]:
-    # AI disclosure - this line was partially generated (the range check at the end) by ChatGPT when reviewing my own implementation of this function.
+    # AI disclosure - this line was partially generated (only the range check at the end) by ChatGPT when reviewing my own implementation of this function.
     cells = [(i, cell) for i, cell in cells if 1 <= len(cell.getEffectiveCandidates()) <= size] # Prematurely remove cells that won't contribute to a naked group.
 
     cellCombinations = itertools.combinations(cells, size)
