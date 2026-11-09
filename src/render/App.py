@@ -45,7 +45,7 @@ class App(ctk.CTk):
             )
         )
 
-    def loadBoardStatePuzzle(self, boardState: BoardState):
+    def loadBoardStatePuzzle(self, boardState: BoardState, puzzleId: int, clueCount: int, difficulty: float):
         self.__setPage(
             SudokuPage(
                 self,

@@ -106,10 +106,10 @@ class TechniqueWidget(ctk.CTkFrame):
         randomIndex = random.randrange(len(results))
         data = results[randomIndex]
 
-        puzzleID = data[0] # TODO
+        puzzleID = data[0]
         serialisedBoard = data[1]
-        givens = data[2] # TODO
-        difficulty = data[3] # TODO
+        givens = data[2]
+        difficulty = data[3]
 
         bs = BoardState.deserialise(serialisedBoard)
-        self.loadBoardStateCommand(bs)
+        self.loadBoardStateCommand(bs, puzzleID, givens, difficulty)
