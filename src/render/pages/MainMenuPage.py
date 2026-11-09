@@ -9,6 +9,7 @@ import customtkinter as ctk
 
 from src.core.BoardState import BoardState
 from src.render.components.CTkRangeSlider import CTkRangeSlider
+from src.render.components.CTkRangeSlider import CTkRangeSlider
 
 DEV_MODE = False
 
@@ -48,6 +49,8 @@ class MainMenuPage(ctk.CTkFrame):
             accountText = f"You are using the {accountName} profile."
 
         ### BUTTONS
+
+        ### BUTTONS
         
         self.accountLabel = ctk.CTkLabel(self, text=accountText)
         self.accountLabel.place(relx=0.5, rely=0.3, anchor="s")
@@ -77,11 +80,32 @@ class MainMenuPage(ctk.CTkFrame):
 
         ### EVERYTHING ELSE
 
+        ### DIFFICULTY SELECT
+
+        minDiff, maxDiff = self.getAvailableDifficultyRange()
+
+        self.difficultySelectFrame = ctk.CTkFrame(self)
+        self.difficultySelectFrame.place(relx=0.5, rely=0.5, anchor="center")
+
+        self.diffLabel = ctk.CTkLabel(self.difficultySelectFrame, text="Difficulty", font=ctk.CTkFont(weight='bold'))
+        self.diffLabel.grid(row=0, column=0, padx=(5, 0))
+
+        self.minDiffLabel = ctk.CTkLabel(self.difficultySelectFrame, text=minDiff)
+        self.minDiffLabel.grid(row=0, column=1, padx=(5, 0))
+
+        self.difficultySlider = CTkRangeSlider(self.difficultySelectFrame, from_=minDiff * 10, to=maxDiff * 10, command=self.updateDifficultySliderLabels)
+        self.difficultySlider.grid(row=0, column=2, padx=5)
+
+        self.maxDiffLabel = ctk.CTkLabel(self.difficultySelectFrame, text=maxDiff)
+        self.maxDiffLabel.grid(row=0, column=3, padx=(0, 5))
+
+        ### EVERYTHING ELSE
+
         self.techniquesButton = ctk.CTkButton(self, text="Techniques Library", font=self.buttonFont, width=400, height=100, command=techniquesPageCommand)
-        self.techniquesButton.place(relx=0.5, rely=0.65, anchor="center")
+        self.techniquesButton.place(relx=0.5, rely=0.655, anchor="center")
 
         self.accountButton = ctk.CTkButton(self, text="Account and Stats", font=self.buttonFont, width=400, height=100, command=accountsPageCommand)
-        self.accountButton.place(relx=0.5, rely=0.85, anchor="center")
+        self.accountButton.place(relx=0.5, rely=0.855, anchor="center")
 
         if DEV_MODE:
             boardInputVar = tk.StringVar()
@@ -91,6 +115,8 @@ class MainMenuPage(ctk.CTkFrame):
             self.boardEntry.bind("<Return>", lambda _: self.loadBoardStateCommand(BoardState.deserialise(self.boardEntry.get())))
 
     def newPuzzle(self):
+        minDiff, maxDiff = self.getSelectedDifficultyRange()
+        
         minDiff, maxDiff = self.getSelectedDifficultyRange()
         
         conn = sqlite3.connect("sudoku.db")
@@ -104,7 +130,9 @@ class MainMenuPage(ctk.CTkFrame):
                 WHERE TAG ='solvable'
                 AND difficulty >= ?
                 AND difficulty <= ?
-            """, (minDiff, maxDiff))
+                AND difficulty >= ?
+                AND difficulty <= ?
+            """, (minDiff, maxDiff), (minDiff, maxDiff))
         except sqlite3.OperationalError as err:
             print("Puzzles table not created.")
             self.accountLabel.configure(text="No puzzles found! Have you set up the puzzle database yet? See README.md for more info.")
@@ -115,6 +143,7 @@ class MainMenuPage(ctk.CTkFrame):
         conn.close()
 
         if len(results) == 0:
+            self.accountLabel.configure(text="No puzzles found matching these constraints!")
             self.accountLabel.configure(text="No puzzles found matching these constraints!")
             self.accountLabel.configure(fg_color='red')
             return
@@ -129,6 +158,32 @@ class MainMenuPage(ctk.CTkFrame):
 
         bs = BoardState.deserialise(serialisedBoard)
         self.loadBoardStateCommand(bs, puzzleID, givens, difficulty)
+
+    def getAvailableDifficultyRange(self):
+        conn = sqlite3.connect("sudoku.db")
+        cur = conn.cursor()
+
+        # Thank you https://stackoverflow.com/questions/45061067/select-the-row-with-maximum-minimum-value-in-sqlite for help with syntax.
+        # TODO - Defensive programming
+        cur.execute("""
+            SELECT MIN(difficulty), MAX(difficulty)
+            FROM Puzzles
+            INNER JOIN PuzzleTags
+                ON Puzzles.PuzzleID = PuzzleTags.PuzzleID
+            WHERE PuzzleTags.Tag = 'solvable'
+        """)
+
+        return cur.fetchone()
+
+    def getSelectedDifficultyRange(self):
+        minDiff, maxDiff = self.difficultySlider.get()
+        return (minDiff // 1) / 10, (maxDiff // 1) / 10
+
+    def updateDifficultySliderLabels(self, argument):
+        minDiff, maxDiff = self.getSelectedDifficultyRange()
+
+        self.minDiffLabel.configure(text=str(minDiff))
+        self.maxDiffLabel.configure(text=str(maxDiff))
 
     def getAvailableDifficultyRange(self):
         conn = sqlite3.connect("sudoku.db")
