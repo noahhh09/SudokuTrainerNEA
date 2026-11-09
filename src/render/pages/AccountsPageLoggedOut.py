@@ -58,6 +58,15 @@ class AccountsPageLoggedOut(ctk.CTkFrame):
         self.profileButtons = []
         conn = sqlite3.connect("sudoku.db")
         cur = conn.cursor()
+
+        cur.execute("""
+            CREATE TABLE IF NOT EXISTS Profiles ( 
+                ProfileID INTEGER PRIMARY KEY AUTOINCREMENT, 
+                Name TEXT NOT NULL UNIQUE,
+                CreatedAt TIMESTAMP DEFAULT (unixepoch())
+            );
+        """) # Thank you https://stackoverflow.com/questions/11556546/sqlite-storing-default-timestamp-as-unixepoch
+
         cur.execute("""
             SELECT ProfileID, Name FROM Profiles
         """)
