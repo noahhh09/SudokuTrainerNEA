@@ -33,7 +33,7 @@ class HiddenSingleExplanation(TechniqueExplanation):
 
         return [
             ShowText("A Hidden Single is when a single candidate appears just once across an entire unit."),
-            HighlightCells(f"Lets pay attention to the unit highlighted. Try to figure out which cells could possibly have the digit {digit}. In other words, where can the digit 6 be placed in this unit?", self.technique.causalUnit),
+            HighlightCells(f"Lets pay attention to the unit highlighted. Try to figure out which cells could possibly have the digit {digit}. In other words, where can the digit {digit} be placed in this unit?", self.technique.causalUnit),
             Steps([
                 PopulateLogicalCandidatesInCells("", self.technique.causalUnit),
                 HighlightCells(f"Notice how the digit {digit} can only be placed inside one cell in this unit?", [self.technique.pos])
