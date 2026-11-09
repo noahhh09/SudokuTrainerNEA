@@ -1,6 +1,7 @@
 # Used to generate database tags and reformat the Kaggle 3 million dataset.
 # https://www.kaggle.com/datasets/radcliffe/3-million-sudoku-puzzles-with-ratings
 # Requires 'sudoku-3m.csv' file in this directory - See README.md 
+URL = "https://www.kaggle.com/datasets/radcliffe/3-million-sudoku-puzzles-with-ratings"
 
 import time
 import sys
@@ -120,16 +121,23 @@ def main():
     print("Loading df...")
     # https://www.w3schools.com/python/pandas/pandas_csv.asp - For help with syntax here.
     # https://pandas.pydata.org/docs/reference/api/pandas.read_csv.html - For help with syntax here.
-    df = pd.read_csv(
-        path, 
-        usecols=["id", "puzzle", "clues", "difficulty", "solution"], 
-        nrows=(None if PUZZLE_LOAD_COUNT <= 0 else PUZZLE_LOAD_COUNT)
-    ).rename(
-        columns={
-            "id": "PuzzleID", 
-            "puzzle": "SerialisedBoard",
-            "solution": "SerialisedSolution"
-        })
+    try:
+        df = pd.read_csv(
+            path, 
+            usecols=["id", "puzzle", "clues", "difficulty", "solution"], 
+            nrows=(None if PUZZLE_LOAD_COUNT <= 0 else PUZZLE_LOAD_COUNT)
+        ).rename(
+            columns={
+                "id": "PuzzleID", 
+                "puzzle": "SerialisedBoard",
+                "solution": "SerialisedSolution"
+            })
+    except FileNotFoundError:
+        print(f"ERROR: No file named 'sudoku-3m.csv' in the '/src/database/' directory. Have you downloaded it from {URL} yet?")
+        return
+    except pd.errors.EmptyDataError:
+        print("ERROR: No data was found in the file 'sudoku-3m.csv' - did you copy it properly?")
+        return
 
     # Converts from the string type used in the Kaggle database to the board string system used throughout the project.
     print(f"Loaded {len(df.index)} dataframe rows. Converting puzzle strings...")
