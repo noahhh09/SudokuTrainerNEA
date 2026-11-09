@@ -51,6 +51,8 @@ class App(ctk.CTk):
                 self,
                 boardState,
                 mainMenuCommand=self.mainMenu,
+                puzzleId=puzzleId,
+                clueCount=clueCount,
                 difficulty=difficulty
             )
         )

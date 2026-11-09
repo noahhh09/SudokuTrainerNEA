@@ -87,7 +87,7 @@ class MainMenuPage(ctk.CTkFrame):
             boardInputVar.set("x14f1f7f2f9fx13fx1/7f6f9fx23f4fx12f/x13f2f6f4fx17f1f9f/4fx13f9fx21f7fx1/6fx17fx24f9fx13f/1f9f5f3f7fx22f4f/2f1f4f5f6f7f3f9f8f/3f7f6fx19fx15f4f1f/9f5f8f4f3f1f2f6f7f")
             self.boardEntry = ctk.CTkEntry(self, width=400, textvariable=boardInputVar)
             self.boardEntry.place(anchor="nw")
-            self.boardEntry.bind("<Return>", lambda _: self.loadBoardStateCommand(BoardState.deserialise(self.boardEntry.get())))
+            self.boardEntry.bind("<Return>", lambda _: self.loadBoardStateCommand(BoardState.deserialise(self.boardEntry.get()), -1, -1, -1))
 
     def newPuzzle(self):
         minDiff, maxDiff = self.getSelectedDifficultyRange()

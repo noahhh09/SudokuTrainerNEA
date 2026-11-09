@@ -26,7 +26,7 @@ except:
     pass # Ignores errors if no flags are specified, or other unrelated flags are.
 
 class SudokuPage(ctk.CTkFrame):
-    def __init__(self, master: Any, boardState: BoardState, mainMenuCommand, difficulty, **kwargs):
+    def __init__(self, master: Any, boardState: BoardState, mainMenuCommand, puzzleId, clueCount, difficulty, **kwargs):
         super().__init__(master, **kwargs)
         if DEV_MODE:
             boardState = BoardUtils.copyAndPopulateCandidates(boardState)
@@ -41,8 +41,13 @@ class SudokuPage(ctk.CTkFrame):
         self.mainMenuButton = ctk.CTkButton(self.headerRowFrame, text="Back to Main Menu", width=200, height=50, command=mainMenuCommand)
         self.mainMenuButton.grid(row=0, column=0, padx=(0, 10))
 
-        self.statusLabel = ctk.CTkLabel(self.headerRowFrame, text=f"Difficulty: {difficulty}")
+        self.statusLabel = ctk.CTkLabel(self.headerRowFrame, text="")
         self.statusLabel.grid(row=0, column=1, sticky="ew")
+
+        if difficulty >= 0 and puzzleId > 0:
+            self.statusLabel.configure(text=f"Puzzle ID: {puzzleId}, Difficulty: {difficulty}")
+        else:
+            self.statusLabel.configure(text="Custom Board State")
 
         self.sudokuGrid = SudokuGrid(self, self.game.boardState)
         self.sudokuGrid.grid(row=1, column=0)
