@@ -1,11 +1,25 @@
+import getopt
 import random
 import sqlite3
+import sys
 from typing import Any
 
 import tkinter as tk
 import customtkinter as ctk
 
 from src.core.BoardState import BoardState
+
+DEV_MODE = False
+
+# Command line developer mode
+# https://www.geeksforgeeks.org/python/command-line-arguments-in-python/
+try:
+    args, values = getopt.getopt(sys.argv[1:], "d", ["dev"])
+    for arg, value in args:
+        if arg in ("-d", "-dev"):
+            DEV_MODE = True
+except:
+    pass # Ignores errors if no flags are specified, or other unrelated flags are.
 
 class MainMenuPage(ctk.CTkFrame):
     def __init__(self, master: Any, profileId: int | None, loadBoardStateCommand, techniquesPageCommand, accountsPageCommand, **kwargs):
@@ -44,12 +58,12 @@ class MainMenuPage(ctk.CTkFrame):
         self.accountButton = ctk.CTkButton(self, text="Account and Stats", font=self.buttonFont, width=400, height=100, command=accountsPageCommand)
         self.accountButton.place(relx=0.5, rely=0.8, anchor="center")
 
-        # TODO - Remove, used to arbitrarily load a board state.
-        entryInput = tk.StringVar()
-        entryInput.set("x14f1f7f2f9fx13fx1/7f6f9fx23f4fx12f/x13f2f6f4fx17f1f9f/4fx13f9fx21f7fx1/6fx17fx24f9fx13f/1f9f5f3f7fx22f4f/2f1f4f5f6f7f3f9f8f/3f7f6fx19fx15f4f1f/9f5f8f4f3f1f2f6f7f")
-        self.entry = ctk.CTkEntry(self, width=400, textvariable=entryInput)
-        self.entry.place(anchor="nw")
-        self.entry.bind("<Return>", lambda _: self.loadBoardStateCommand(BoardState.deserialise(self.entry.get())))
+        if DEV_MODE:
+            boardInputVar = tk.StringVar()
+            boardInputVar.set("x14f1f7f2f9fx13fx1/7f6f9fx23f4fx12f/x13f2f6f4fx17f1f9f/4fx13f9fx21f7fx1/6fx17fx24f9fx13f/1f9f5f3f7fx22f4f/2f1f4f5f6f7f3f9f8f/3f7f6fx19fx15f4f1f/9f5f8f4f3f1f2f6f7f")
+            self.boardEntry = ctk.CTkEntry(self, width=400, textvariable=boardInputVar)
+            self.boardEntry.place(anchor="nw")
+            self.boardEntry.bind("<Return>", lambda _: self.loadBoardStateCommand(BoardState.deserialise(self.boardEntry.get())))
 
     def newPuzzle(self):
         conn = sqlite3.connect("sudoku.db")

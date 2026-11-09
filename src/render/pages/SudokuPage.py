@@ -20,10 +20,10 @@ DEV_MODE = False
 try:
     args, values = getopt.getopt(sys.argv[1:], "d", ["dev"])
     for arg, value in args:
-        if arg in ("-dev", "--dev"):
+        if arg in ("-d", "-dev"):
             DEV_MODE = True
 except:
-    pass
+    pass # Ignores errors if no flags are specified, or other unrelated flags are.
 
 class SudokuPage(ctk.CTkFrame):
     def __init__(self, master: Any, boardState: BoardState, mainMenuCommand, **kwargs):
