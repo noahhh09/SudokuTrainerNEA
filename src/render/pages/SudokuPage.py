@@ -17,10 +17,13 @@ DEV_MODE = False
 
 # Command line developer mode
 # https://www.geeksforgeeks.org/python/command-line-arguments-in-python/
-args, values = getopt.getopt(sys.argv[1:], "d", ["dev"])
-for arg, value in args:
-    if arg in ("-dev", "--dev"):
-        DEV_MODE = True
+try:
+    args, values = getopt.getopt(sys.argv[1:], "d", ["dev"])
+    for arg, value in args:
+        if arg in ("-dev", "--dev"):
+            DEV_MODE = True
+except:
+    pass
 
 class SudokuPage(ctk.CTkFrame):
     def __init__(self, master: Any, boardState: BoardState, mainMenuCommand, **kwargs):
