@@ -19,7 +19,7 @@ DEV_MODE = False
 # https://www.geeksforgeeks.org/python/command-line-arguments-in-python/
 args, values = getopt.getopt(sys.argv[1:], "d", ["dev"])
 for arg, value in args:
-    if arg in ("-dev" or "--dev"):
+    if arg in ("-dev", "--dev"):
         DEV_MODE = True
 
 class SudokuPage(ctk.CTkFrame):
