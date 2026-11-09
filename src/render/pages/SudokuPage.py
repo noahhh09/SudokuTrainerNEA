@@ -1,6 +1,7 @@
 from typing import Any
 
 import customtkinter as ctk
+import getopt, sys
 
 from src.analysis import ALL_TECHNIQUE_TYPES, BoardUtils
 from src.analysis.Technique import Technique
@@ -12,10 +13,21 @@ from src.render.components.core.SudokuControls import EditState, SudokuControls
 from src.render.components.core.SudokuGrid import SudokuGrid
 from src.render.components.gameplay.SudokuHintMenu import SudokuHintMenu
 
+DEV_MODE = False
+
+# Command line developer mode
+# https://www.geeksforgeeks.org/python/command-line-arguments-in-python/
+args, values = getopt.getopt(sys.argv[1:], "d", ["dev"])
+for arg, value in args:
+    if arg in ("-dev" or "--dev"):
+        DEV_MODE = True
+
 class SudokuPage(ctk.CTkFrame):
     def __init__(self, master: Any, boardState: BoardState, mainMenuCommand, **kwargs):
         super().__init__(master, **kwargs)
-        boardState = BoardUtils.copyAndPopulateCandidates(boardState)
+        if DEV_MODE:
+            boardState = BoardUtils.copyAndPopulateCandidates(boardState)
+
         self.game = Game(boardState)
 
         self.grid_columnconfigure(0, weight=1)
@@ -29,11 +41,12 @@ class SudokuPage(ctk.CTkFrame):
         self.controls = SudokuControls(self, root=self.master, updateSelectedCellCommand=self.updateSelectedCellValue, undoCommand=self.__undo, redoCommand=self.__redo)
         self.controls.grid(row=2, column=0, pady=10, sticky="n")
 
-        self.printBoardStateTODORemove = ctk.CTkButton(self, text="Print Current State", width=200, height=50, command=lambda: print("Snapshot", self.game.boardState.serialise()))
-        self.printBoardStateTODORemove.grid(row=0, column=1, sticky="w", padx=(5, 0), pady=10)
+        if DEV_MODE:
+            self.printCurrentStateButton = ctk.CTkButton(self, text="Print Current State", width=200, height=50, command=lambda: print("Snapshot", self.game.boardState.serialise()))
+            self.printCurrentStateButton.grid(row=0, column=1, sticky="w", padx=(5, 0), pady=10)
 
-        self.advanceTODORemove = ctk.CTkButton(self, text="Advance", width=200, height=50, command=self.advance)
-        self.advanceTODORemove.grid(row=0, column=2, sticky="w", padx=(5, 0), pady=10)
+            self.advanceButton = ctk.CTkButton(self, text="Advance", width=200, height=50, command=self.advance)
+            self.advanceButton.grid(row=0, column=2, sticky="w", padx=(5, 0), pady=10)
 
         self.hintsFrame = ctk.CTkFrame(self, bg_color="transparent")
         self.hintsFrame.grid(row=1, column=1, sticky="nsew", padx=5, pady=5, rowspan=2)
