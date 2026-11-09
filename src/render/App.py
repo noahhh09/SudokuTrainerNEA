@@ -50,7 +50,8 @@ class App(ctk.CTk):
             SudokuPage(
                 self,
                 boardState,
-                mainMenuCommand=self.mainMenu
+                mainMenuCommand=self.mainMenu,
+                difficulty=difficulty
             )
         )
 
