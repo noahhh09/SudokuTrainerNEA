@@ -1,9 +1,7 @@
 import random
 import sqlite3
-import json
 
 import customtkinter as ctk
-import pandas as pd
 
 from src.analysis import ALL_TECHNIQUE_TYPES
 from src.analysis.Technique import Technique
@@ -18,7 +16,7 @@ class TechniquesLibraryPage(ctk.CTkFrame):
         self.mainMenuButton = ctk.CTkButton(self, text="Back to Main Menu", width=200, height=50, command=mainMenuCommand)
         self.mainMenuButton.place(relx=0.01, rely=0.05, anchor="w")
 
-        self.statusLabel = ctk.CTkLabel(self, text="")
+        self.statusLabel = ctk.CTkLabel(self, text="", fg_color='red', width=0)
         self.statusLabel.place(relx=0.5, rely=0.05, anchor="center")
 
         self.techniquesGrid = ctk.CTkScrollableFrame(self)
@@ -51,18 +49,27 @@ class TechniqueWidget(ctk.CTkFrame):
         self.practiceButton = ctk.CTkButton(self, text="Practice", command=self.practiceTechnique)
         self.practiceButton.place(relx=0.5, rely=0.9, anchor="center")
 
+        count = 0 # Default value if the SELECT statement does not work.
         conn = sqlite3.connect("sudoku.db")
-        df = pd.read_sql_query("""
-            SELECT COUNT(*) AS Count
-            FROM PuzzleTags Tag1
-            INNER JOIN PuzzleTags Tag2
-                ON Tag1.PuzzleID = Tag2.PuzzleID
-            WHERE Tag1.Tag = ?
-            AND Tag2.Tag = 'solvable'
-        """, conn, params=(self.technique.__name__, ))
+        cur = conn.cursor()
+        try:
+            cur.execute("""
+                SELECT COUNT(*)
+                FROM PuzzleTags Tag1
+                INNER JOIN PuzzleTags Tag2
+                    ON Tag1.PuzzleID = Tag2.PuzzleID
+                WHERE Tag1.Tag = ?
+                AND Tag2.Tag = 'solvable'
+            """, (self.technique.__name__,))
+
+            count = cur.fetchone()[0]
+        except sqlite3.OperationalError as err:
+            self.statusLabel.configure(text="Warning: puzzle tags could not be found. Have you set up the database using init_database.py?")
+            print("Puzzle tags not found: ", err)
+        
         conn.close()
 
-        self.countLabel = ctk.CTkLabel(self, text=f"{df["Count"].iloc[0]}", wraplength=168, font=ctk.CTkFont(size=10,slant="italic"))
+        self.countLabel = ctk.CTkLabel(self, text=f"{count}", wraplength=168, font=ctk.CTkFont(size=10))
         self.countLabel.place(relx=0.5, rely=0.75, anchor="s")
 
     def explainTechnique(self):
@@ -74,23 +81,35 @@ class TechniqueWidget(ctk.CTkFrame):
 
     def practiceTechnique(self):
         conn = sqlite3.connect("sudoku.db")
-        df = pd.read_sql_query("""
-        SELECT P.PuzzleID, P.SerialisedBoard, P.clues, P.difficulty
-        FROM Puzzles P
-        INNER JOIN PuzzleTags Tag1
-            ON P.PuzzleID = Tag1.PuzzleID
-        INNER JOIN PuzzleTags Tag2
-            ON P.PuzzleID = Tag2.PuzzleID
-        WHERE Tag1.Tag = ?
-        AND Tag2.Tag = 'solvable'
-""", conn, params=(self.technique.__name__,))
+        cur = conn.cursor()
+        try:
+            cur.execute("""
+                SELECT P.PuzzleID, P.SerialisedBoard, P.clues, P.difficulty
+                FROM Puzzles P
+                INNER JOIN PuzzleTags Tag1
+                    ON P.PuzzleID = Tag1.PuzzleID
+                INNER JOIN PuzzleTags Tag2
+                    ON P.PuzzleID = Tag2.PuzzleID
+                WHERE Tag1.Tag = ?
+                AND Tag2.Tag = 'solvable'
+            """, (self.technique.__name__,))
+        except:
+            pass
+
+        results = cur.fetchall()
         conn.close()
 
-        if df.empty:
-            print("No puzzles found matching constraints")
+        if len(results) == 0:
+            self.statusLabel.configure(text="Sorry, no puzzles could be found. Have you set up the database using init_database.py?")
             return
 
-        randomIndex = random.randrange(len(df))
-        puzzleData = json.loads(df.iloc[randomIndex].to_json())
-        bs = BoardState.deserialise(puzzleData["SerialisedBoard"])
+        randomIndex = random.randrange(len(results))
+        data = results[randomIndex]
+
+        puzzleID = data[0] # TODO
+        serialisedBoard = data[1]
+        givens = data[2] # TODO
+        difficulty = data[3] # TODO
+
+        bs = BoardState.deserialise(serialisedBoard)
         self.loadBoardStateCommand(bs)

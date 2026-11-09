@@ -47,8 +47,6 @@ class App(ctk.CTk):
         )
 
     def loadBoardStatePuzzle(self, boardState: BoardState):
-        # boardState = BoardUtils.copyAndPopulateCandidates(boardState)
-
         self.__setPage(
             SudokuPage(
                 self,

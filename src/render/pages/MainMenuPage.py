@@ -1,11 +1,9 @@
-import json
 import random
 import sqlite3
 from typing import Any
 
 import tkinter as tk
 import customtkinter as ctk
-import pandas as pd
 
 from src.core.BoardState import BoardState
 
@@ -55,19 +53,36 @@ class MainMenuPage(ctk.CTkFrame):
 
     def newPuzzle(self):
         conn = sqlite3.connect("sudoku.db")
-        df = pd.read_sql_query("""
-        SELECT P.PuzzleID, P.SerialisedBoard, P.clues, P.difficulty
-        FROM Puzzles P
-        INNER JOIN PuzzleTags
-            ON P.PuzzleID = PuzzleTags.PuzzleID
-        WHERE Tag = 'solvable'
-""", conn)
+        cur = conn.cursor()
+        try:
+            cur.execute("""
+                SELECT Puzzles.PuzzleID, SerialisedBoard, clues, difficulty
+                FROM Puzzles
+                INNER JOIN PuzzleTags
+                    ON Puzzles.PuzzleID = PuzzleTags.PuzzleID
+                WHERE TAG ='solvable'
+            """)
+        except sqlite3.OperationalError as err:
+            print("Puzzles table not created.")
+            self.accountLabel.configure(text="No puzzles found! Have you set up the puzzle database yet? See README.md for more info.")
+            self.accountLabel.configure(fg_color='red')
+            raise err
 
-        if df.empty:
-            print("No puzzles found")
+        results = cur.fetchall()
+        conn.close()
+
+        if len(results) == 0:
+            self.accountLabel.configure(text="No puzzles found! Have you set up the puzzle database yet? See README.md for more info.")
+            self.accountLabel.configure(fg_color='red')
             return
 
-        randomIndex = random.randrange(len(df))
-        puzzleData = json.loads(df.iloc[randomIndex].to_json())
-        bs = BoardState.deserialise(puzzleData["SerialisedBoard"])
+        randomIndex = random.randrange(len(results))
+        data = results[randomIndex]
+
+        puzzleID = data[0] # TODO
+        serialisedBoard = data[1]
+        givens = data[2] # TODO
+        difficulty = data[3] # TODO
+
+        bs = BoardState.deserialise(serialisedBoard)
         self.loadBoardStateCommand(bs)

@@ -7,7 +7,6 @@ from src.analysis.Technique import Technique
 from src.core.BoardState import BoardState
 from src.explanation.ExplanationFactory import ExplanationFactory
 from src.explanation.Step import Step
-from src.explanation.TechniqueExplanation import TechniqueExplanation
 from src.render.components.core.SudokuGrid import SudokuGrid
 
 class TechniqueLearningPage(ctk.CTkFrame):
@@ -18,8 +17,8 @@ class TechniqueLearningPage(ctk.CTkFrame):
         boardState = customBoard
         if customBoard is None: # Generate a random board state where the technique is available.
             conn = sqlite3.connect("sudoku.db")
-                    
             cur = conn.cursor()
+
             cur.execute("""
                 SELECT Puzzles.SerialisedBoard
                 FROM Puzzles
