@@ -2,7 +2,7 @@ import customtkinter as ctk
 
 from src.analysis import BoardUtils
 from src.analysis.Unit import Unit
-from src.core.Move import Move, ValueChangeMove
+from src.core.Move import Move
 from src.render.components.core.SudokuGrid import SudokuGrid
 
 class Step:

@@ -1,5 +1,4 @@
 from typing import Tuple
-from src.analysis import BoardUtils
 from src.analysis.Technique import Technique
 from src.core.BoardState import BoardState
 from src.render.pages.AccountsPageLoggedIn import AccountsPageLoggedIn

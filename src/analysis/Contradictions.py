@@ -1,7 +1,6 @@
 from src.analysis import BoardUtils
 from src.analysis.Unit import Unit, UnitType
 
-from ..core.Cell import Cell
 from ..core.BoardState import BoardState
 
 

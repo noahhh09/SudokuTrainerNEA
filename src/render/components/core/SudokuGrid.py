@@ -4,7 +4,6 @@ import customtkinter as ctk
 import tkinter as tk
 
 from src.analysis import Contradictions
-from src.analysis.Unit import Unit
 from src.core.BoardState import BoardState
 from src.core.Cell import Cell
 

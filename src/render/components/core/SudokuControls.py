@@ -1,4 +1,4 @@
-from typing import Any, Tuple
+from typing import Any
 from enum import Enum
 
 import customtkinter as ctk

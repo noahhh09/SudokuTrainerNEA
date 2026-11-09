@@ -1,5 +1,6 @@
 from src.analysis.techniques.XWing import XWing
 from src.core.BoardState import BoardState
+from src.core.Move import ValueChangeMove
 from src.explanation.Step import *
 from src.explanation.TechniqueExplanation import TechniqueExplanation
 

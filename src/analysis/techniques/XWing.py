@@ -1,5 +1,3 @@
-import time
-
 from src.analysis import BoardUtils
 from src.analysis.Technique import Technique
 from src.analysis.Unit import Unit, UnitType

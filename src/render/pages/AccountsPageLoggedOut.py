@@ -1,7 +1,6 @@
 import sqlite3
 from typing import Any
 
-import bcrypt
 import customtkinter as ctk
 
 from src.render.components.ConfirmDeleteButton import ConfirmDeleteButton
