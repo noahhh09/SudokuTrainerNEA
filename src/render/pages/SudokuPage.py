@@ -26,7 +26,7 @@ except:
     pass # Ignores errors if no flags are specified, or other unrelated flags are.
 
 class SudokuPage(ctk.CTkFrame):
-    def __init__(self, master: Any, boardState: BoardState, mainMenuCommand, **kwargs):
+    def __init__(self, master: Any, boardState: BoardState, mainMenuCommand, difficulty, **kwargs):
         super().__init__(master, **kwargs)
         if DEV_MODE:
             boardState = BoardUtils.copyAndPopulateCandidates(boardState)
@@ -35,8 +35,14 @@ class SudokuPage(ctk.CTkFrame):
 
         self.grid_columnconfigure(0, weight=1)
 
-        self.mainMenuButton = ctk.CTkButton(self, text="Back to Main Menu", width=200, height=50, command=mainMenuCommand)
-        self.mainMenuButton.grid(row=0, column=0, sticky="w", padx=(5, 0), pady=10)
+        self.headerRowFrame = ctk.CTkFrame(self)
+        self.headerRowFrame.grid(row=0, column=0, columnspan=2, padx=(5, 0), pady=10, sticky="ew")
+
+        self.mainMenuButton = ctk.CTkButton(self.headerRowFrame, text="Back to Main Menu", width=200, height=50, command=mainMenuCommand)
+        self.mainMenuButton.grid(row=0, column=0, padx=(0, 10))
+
+        self.statusLabel = ctk.CTkLabel(self.headerRowFrame, text=f"Difficulty: {difficulty}")
+        self.statusLabel.grid(row=0, column=1, sticky="ew")
 
         self.sudokuGrid = SudokuGrid(self, self.game.boardState)
         self.sudokuGrid.grid(row=1, column=0)
@@ -46,10 +52,10 @@ class SudokuPage(ctk.CTkFrame):
 
         if DEV_MODE:
             self.printCurrentStateButton = ctk.CTkButton(self, text="Print Current State", width=200, height=50, command=lambda: print("Snapshot", self.game.boardState.serialise()))
-            self.printCurrentStateButton.grid(row=0, column=1, sticky="w", padx=(5, 0), pady=10)
+            self.printCurrentStateButton.place(relx=0.8, rely=0.05, anchor="e")
 
             self.advanceButton = ctk.CTkButton(self, text="Advance", width=200, height=50, command=self.advance)
-            self.advanceButton.grid(row=0, column=2, sticky="w", padx=(5, 0), pady=10)
+            self.advanceButton.place(relx=1, rely=0.05, anchor="e")
 
         self.hintsFrame = ctk.CTkFrame(self, bg_color="transparent")
         self.hintsFrame.grid(row=1, column=1, sticky="nsew", padx=5, pady=5, rowspan=2)
