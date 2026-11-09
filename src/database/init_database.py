@@ -3,6 +3,7 @@
 # Requires 'sudoku-3m.csv' file in this directory - See README.md 
 
 import time
+import sys
 from pathlib import Path
 import pandas as pd
 import sqlite3
@@ -12,20 +13,27 @@ from src.core.BoardState import BoardState
 
 # Applying tags takes quite a while. Approx 40 boards per second when filtering unsolvable boards and applying first state tags.
 # Set to -1 to load all from dataset.
-PUZZLE_LOAD_COUNT = 10000
 
-global checked
-global unsolvable
-checked = 0
-unsolvable = 0
+# https://www.geeksforgeeks.org/python/command-line-arguments-in-python/ - For help with syntax
+PUZZLE_LOAD_COUNT = 1000
+args = sys.argv[1:]
+if len(args) > 0:
+    try:
+        PUZZLE_LOAD_COUNT = int(args[0])
+    except:
+        pass
+
+PRINT_INTERVAL = (PUZZLE_LOAD_COUNT // 100) + 1 # Avoids division by 0 errors.
 
 # Converts from the string type used in the Kaggle database to the board string system used throughout the project.
-def convertPuzzleString(puzzle: str):
+# The kaggle dataset uses this format: "a string of 81 characters. Periods indicate unknown values." e.g. 1..5.37..6.3 and so on.
+def convertPuzzleString(puzzle: int | str):
+    puzzle = str(puzzle) # pandas can treat the Kaggle solution strings as integers, as it is just 81 numbers
     result = ""
     consequtiveZeroes = 0
 
     for i, char in enumerate(list(puzzle)):
-        if i % 9 == 0 and i != 0:
+        if i % 9 == 0 and i != 0: # End of row has been passed
             if consequtiveZeroes > 0:
                 result += "x" + str(consequtiveZeroes)
 
@@ -47,7 +55,7 @@ def convertPuzzleString(puzzle: str):
 
     global checked
     checked += 1
-    if checked % 100 == 0:
+    if checked % PRINT_INTERVAL == 0 or checked == PUZZLE_LOAD_COUNT:
         print(f"\r    Converted {checked} BoardStrings", end="", flush=True)
     
     return result
@@ -55,9 +63,6 @@ def convertPuzzleString(puzzle: str):
 def applyTags(row):
     boardState = BoardState.deserialise(row["SerialisedBoard"])
     tags = []
-
-    global checked
-    global unsolvable
 
     # Apply tags for techniques available in the initial board state.
     for technique in ALL_TECHNIQUE_TYPES:
@@ -83,12 +88,14 @@ def applyTags(row):
     if boardState.isFull():
         tags.append("solvable")
     else:
+        global unsolvable
         unsolvable += 1
 
-    # Live stats whilst running the file.
+    # Used for printing the status whilst running the script.
     global startTime
+    global checked
     checked += 1
-    if checked % 100 == 0:
+    if checked % PRINT_INTERVAL == 0 or checked == PUZZLE_LOAD_COUNT:
         now = time.time()
         delta = now - startTime
         avg = delta / checked
@@ -101,54 +108,74 @@ def applyTags(row):
 
     return tags
 
-path = Path(__file__).parent / "sudoku-3m.csv"
+def main():
+    # These variables are just used for the printing functions whilst running the script.
+    global checked
+    global unsolvable
+    checked = 0
+    unsolvable = 0
 
-print("Loading df...")
-df = pd.read_csv(path, usecols=["id", "puzzle", "clues", "difficulty", "solution"], nrows=(None if PUZZLE_LOAD_COUNT <= 0 else PUZZLE_LOAD_COUNT)).rename(columns={"id": "PuzzleID", "puzzle": "SerialisedBoard", "solution": "SerialisedSolution"})
+    path = Path(__file__).parent / "sudoku-3m.csv"
 
-# Converts from the string type used in the Kaggle database to the board string system used throughout the project.
-print(f"Loaded {len(df.index)} dataframe rows. Converting puzzle strings...")
-df['SerialisedBoard'] = df['SerialisedBoard'].apply(lambda x:convertPuzzleString(x))
-print()
-print("Converted puzzle strings. Converting solution strings...")
-checked = 0
-df['SerialisedSolution'] = df['SerialisedSolution'].apply(lambda x:convertPuzzleString(str(x)))
-print()
-print("Converted solution strings. Storing puzzles...")
+    print("Loading df...")
+    # https://www.w3schools.com/python/pandas/pandas_csv.asp - For help with syntax here.
+    # https://pandas.pydata.org/docs/reference/api/pandas.read_csv.html - For help with syntax here.
+    df = pd.read_csv(
+        path, 
+        usecols=["id", "puzzle", "clues", "difficulty", "solution"], 
+        nrows=(None if PUZZLE_LOAD_COUNT <= 0 else PUZZLE_LOAD_COUNT)
+    ).rename(
+        columns={
+            "id": "PuzzleID", 
+            "puzzle": "SerialisedBoard",
+            "solution": "SerialisedSolution"
+        })
 
-# Saves the new Puzzles table to the database.
-conn = sqlite3.connect("sudoku.db")
-df.to_sql(
-    "Puzzles",
-    conn,
-    if_exists="replace",
-    index=False
-)
-print("Stored puzzles.")
+    # Converts from the string type used in the Kaggle database to the board string system used throughout the project.
+    print(f"Loaded {len(df.index)} dataframe rows. Converting puzzle strings...")
+    # https://www.geeksforgeeks.org/python/difference-between-map-applymap-and-apply-methods-in-pandas/ - for discovering map()
+    df['SerialisedBoard'] = df['SerialisedBoard'].map(convertPuzzleString) 
+    print()
+    print("Converted puzzle strings. Converting solution strings...")
+    checked = 0
+    df['SerialisedSolution'] = df['SerialisedSolution'].map(convertPuzzleString)
+    print()
+    print("Converted solution strings. Storing puzzles...")
 
-# Calculates the tags that can be attributed to each puzzle, including wether it is solvable using the implemented techniques.
-global startTime
-checked = 0
-startTime = time.time()
-tags_df = df[["PuzzleID", "SerialisedBoard"]]
+    # Saves the new Puzzles table to the database.
+    conn = sqlite3.connect("sudoku.db")
+    df.to_sql(
+        "Puzzles",
+        conn,
+        if_exists="replace",
+        index=False
+    )
+    print("Stored puzzles.")
 
-toBeTagged = PUZZLE_LOAD_COUNT if PUZZLE_LOAD_COUNT > 0 else len(tags_df.index)
-print(f"Tagging first {toBeTagged} puzzles.")
-tags_df["Tag"] = tags_df.head(toBeTagged).apply(
-    lambda row: applyTags(row),
-    axis=1
-)
-tags_df = tags_df.explode("Tag") # Atomises tags into their own records, to follow 1NF.
+    # Calculates the tags that can be attributed to each puzzle, including wether it is solvable using the implemented techniques.
+    # The startTime variable is just used for the printing functions whilst running the script.
+    global startTime
+    checked = 0
+    startTime = time.time()
+    tags_df = df[["PuzzleID", "SerialisedBoard"]] # Gets only the PuzzleID and SerialisedBoard columns
 
-# Stores tags in the separate PuzzleTags table in the database.
-print()
-print("Applied tags.")
-print(f"Storing {checked} tagged Puzzles")
-tags_df[["PuzzleID", "Tag"]].to_sql(
-    "PuzzleTags",
-    conn,
-    if_exists="replace",
-    index=False
-)
+    toBeTagged = PUZZLE_LOAD_COUNT if PUZZLE_LOAD_COUNT > 0 else len(tags_df.index)
+    print(f"Tagging first {toBeTagged} puzzles.")
+    tags_df["Tag"] = tags_df.head(toBeTagged).apply(applyTags, axis=1) # Apply is essentially the same as map, but allows for changing axis.
+    tags_df = tags_df.explode("Tag") # Atomises tags into their own records, to follow 1NF. Thanks https://www.zhihu.com/en/answer/3400952762 for solving my problems.
 
-conn.close()
+    # Stores tags in the separate PuzzleTags table in the database.
+    print()
+    print("Applied tags.")
+    print(f"Storing {checked} tagged Puzzles")
+    tags_df[["PuzzleID", "Tag"]].to_sql(
+        "PuzzleTags",
+        conn,
+        if_exists="replace",
+        index=False
+    )
+
+    conn.close()
+
+if __name__ == "__main__":
+    main()
