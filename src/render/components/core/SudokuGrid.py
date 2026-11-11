@@ -75,13 +75,12 @@ class SudokuGrid(ctk.CTkFrame):
         for i in range(9):
             for j in range(9):
                 cell = self.boardState.getCell(i, j)
-                entered = cell.getValue()
-                if not cell.isEditable() or entered == None:
+                enteredValue = cell.getValue()
+                if not cell.isEditable() or enteredValue == None:
                     continue
 
-                solution = self.solution.getCell(i, j).getValue()
-                print(solution)
-                if solution != entered:
+                solutionValue = self.solution.getCell(i, j).getValue()
+                if solutionValue != enteredValue:
                     self.sudokuCells[i][j].highlight("#ff7700")
 
 
