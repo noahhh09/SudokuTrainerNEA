@@ -6,9 +6,9 @@ import customtkinter as ctk
 from src.render.components.ConfirmDeleteButton import ConfirmDeleteButton
 
 class AccountsPageLoggedOut(ctk.CTkFrame):
-    def __init__(self, master: Any, mainMenuCommand, setIdCommand, accountsPageCommand):
+    def __init__(self, master: Any, mainMenuCommand, setAccountIdCommand, accountsPageCommand):
         super().__init__(master)
-        self.setIdCommand = setIdCommand
+        self.setIdCommand = setAccountIdCommand
         self.accountsPageCommand = accountsPageCommand
 
         self.grid_rowconfigure(1, weight=1)

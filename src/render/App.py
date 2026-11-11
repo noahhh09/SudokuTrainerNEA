@@ -105,7 +105,7 @@ class App(ctk.CTk):
                 AccountsPageLoggedOut(
                     self,
                     mainMenuCommand=self.mainMenu,
-                    setIdCommand=self.setProfileId,
+                    setAccountIdCommand=self.setProfileId,
                     accountsPageCommand=self.accountsPage
                 )
             )
@@ -115,6 +115,7 @@ class App(ctk.CTk):
                     self,
                     profileId=self.profileId,
                     mainMenuCommand=self.mainMenu,
+                    setAccountIdCommand=self.setProfileId,
                     accountsPageCommand=self.accountsPage
                 )
             )
