@@ -8,9 +8,10 @@ from src.core.BoardState import BoardState
 
 
 class SudokuFeed(ctk.CTkFrame):
-    def __init__(self, master: Any, firstState: BoardState, applyCommand):
+    def __init__(self, master: Any, firstState: BoardState, solution: BoardState | None, applyCommand):
         super().__init__(master, corner_radius=0, border_width=2)
         self.board = firstState
+        self.solution = solution
         self.applyCommand = applyCommand
 
         self.grid_columnconfigure(0, weight=1)
@@ -38,8 +39,7 @@ class SudokuFeed(ctk.CTkFrame):
         contradictions = Contradictions.detectContradictions(board)
         for contra in contradictions:
             widget = ContradictionWidget(self.feedFrame, contra)
-            widget.grid(row=len(self.feedWidgets), sticky="ew", pady=(0 if len(self.feedWidgets) == 0 else 10, 0))
-            self.feedWidgets.append(widget)
+            widget.add(self.feedWidgets)
 
         for techniqueType in ALL_TECHNIQUE_TYPES:
             techniques = techniqueType.findAvailable(board)
@@ -50,6 +50,25 @@ class SudokuFeed(ctk.CTkFrame):
                     widget = HintWidget(self.feedFrame, instance, revealCommand=self.revealHintProperty, applyCommand=self.applyCommand, discardCommand=self.discardHint, revealed=self.revealedHintProperties[identity])
                     widget.grid(row=len(self.feedWidgets), sticky="ew", pady=(0 if len(self.feedWidgets) == 0 else 5, 0))
                     self.feedWidgets.append(widget)
+
+        self.updateInconsistenciesWithSolution()
+
+    def updateInconsistenciesWithSolution(self):
+        if self.solution is None:
+            return
+
+        for i in range(9):
+            for j in range(9):
+                cell = self.board.getCell(i, j)
+                entered = cell.getValue()
+                if not cell.isEditable() or entered == None:
+                    continue
+
+                solution = self.solution.getCell(i, j).getValue()
+                print(solution)
+                if solution != entered:
+                    widget = SolutionInconsistencyWidget(self.feedFrame, i + 1, j + 1, entered)
+                    widget.add(self.feedWidgets)
 
     def addHint(self, technique: Technique, reveal: list[str] = []) -> bool:
         identity = technique.identity()
@@ -74,19 +93,41 @@ class SudokuFeed(ctk.CTkFrame):
 
         self.repopulate(self.board)
 
-
-class ContradictionWidget(ctk.CTkFrame):
-    def __init__(self, master: Any, contra: Contradictions.Contradiction):
-        super().__init__(master, border_width=2, border_color="#ee0000")
+class BasicFeedWidget(ctk.CTkFrame):
+    def __init__(self, master: Any, title: str, descriptionText: str, colour: str):
+        super().__init__(master, border_width=2, border_color=colour)
 
         titleFont = ctk.CTkFont(size=16, weight="bold")
-        titleLabel = ctk.CTkLabel(self, text="Contradiction", font=titleFont)
+        titleLabel = ctk.CTkLabel(self, text=title, font=titleFont)
         titleLabel.grid(row=0, column=0, sticky="w", padx=2, pady=2)
 
-        description = ctk.CTkLabel(self, text=f"There are {len(contra.cellsInvolved)} of the digit {contra.value} in {contra.unitType.name} {contra.unitIndex + 1}")
+        description = ctk.CTkLabel(self, text=descriptionText)
         description.grid(row=1, column=0, sticky="w", padx=2, pady=2)
 
+    def add(self, widgetsList: list[ctk.CTkBaseClass]):
+        self.grid(row=len(widgetsList), sticky="ew", pady=(0 if len(widgetsList) == 0 else 5, 0))
+        widgetsList.append(self)
 
+
+class ContradictionWidget(BasicFeedWidget):
+    def __init__(self, master: Any, contra: Contradictions.Contradiction):
+        super().__init__(
+            master, 
+            "Contradiction", 
+            f"There are {len(contra.cellsInvolved)} of the digit {contra.value} in {contra.unitType.name} {contra.unitIndex + 1}", 
+            colour="#ee0000"
+        )
+
+
+class SolutionInconsistencyWidget(BasicFeedWidget):
+    def __init__(self, master: Any, row: int, col: int, enteredValue: int):
+        super().__init__(
+            master, 
+            "Inconsistency with Solution", 
+            f"The value {enteredValue} entered in cell ({row}, {col}) does not match the solution of the puzzle!", 
+            "#ff7700"
+        )
+        
 class HintWidget(ctk.CTkFrame):
     def __init__(self, master: Any, technique: Technique, revealCommand, discardCommand, applyCommand, revealed: list[str] = []):
         super().__init__(master, border_width=2)

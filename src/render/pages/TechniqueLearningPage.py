@@ -59,8 +59,8 @@ class TechniqueLearningPage(ctk.CTkFrame):
         self.explanation = ExplanationFactory.getExplanation(self.technique, boardState) # get the appropriate explanation for this technique type.
         self.explanation.getCurrent().apply(self.sudokuGrid, self.infoLabel) # load initial explanation step.
 
-        self.advanceButton = ctk.CTkButton(self, command=self.previousStep, text="<")
-        self.advanceButton.grid(row=2, column=1, sticky="ew")
+        self.backButton = ctk.CTkButton(self, command=self.previousStep, text="<")
+        self.backButton.grid(row=2, column=1, sticky="ew")
 
         self.advanceButton = ctk.CTkButton(self, command=self.nextStep, text=">")
         self.advanceButton.grid(row=2, column=2, sticky="ew")

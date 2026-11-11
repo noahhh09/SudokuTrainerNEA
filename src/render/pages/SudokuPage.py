@@ -1,3 +1,4 @@
+import sqlite3
 from typing import Any
 
 import customtkinter as ctk
@@ -26,12 +27,37 @@ except:
     pass # Ignores errors if no flags are specified, or other unrelated flags are.
 
 class SudokuPage(ctk.CTkFrame):
-    def __init__(self, master: Any, boardState: BoardState, mainMenuCommand, puzzleId, clueCount, difficulty, **kwargs):
+    # puzzleId = -1 for custom board states
+    def __init__(self, master: Any, boardState: BoardState, mainMenuCommand, puzzleId=-1, customSolution: BoardState | None = None, **kwargs):
         super().__init__(master, **kwargs)
         if DEV_MODE:
             boardState = BoardUtils.copyAndPopulateCandidates(boardState)
 
         self.game = Game(boardState)
+
+        self.difficulty = -1 # Default for custom board states (as unknown)
+        self.solution = customSolution
+        if puzzleId > 0:
+            conn = sqlite3.connect("sudoku.db")
+            cur = conn.cursor()
+
+            try:
+                cur.execute("""
+                    SELECT SerialisedSolution, difficulty
+                    FROM Puzzles
+                    WHERE PuzzleID = ?
+                """, (puzzleId,))
+                solution, difficulty = cur.fetchone()
+                self.difficulty = difficulty
+
+                if self.solution is None:
+                    self.solution = solution
+
+            except sqlite3.OperationalError as err:
+                print(err)
+
+            conn.close()
+            
 
         self.grid_columnconfigure(0, weight=1)
 
@@ -44,12 +70,12 @@ class SudokuPage(ctk.CTkFrame):
         self.statusLabel = ctk.CTkLabel(self.headerRowFrame, text="")
         self.statusLabel.grid(row=0, column=1, sticky="ew")
 
-        if difficulty >= 0 and puzzleId > 0:
-            self.statusLabel.configure(text=f"Puzzle ID: {puzzleId}, Difficulty: {difficulty}")
+        if self.difficulty >= 0 and puzzleId > 0:
+            self.statusLabel.configure(text=f"Puzzle ID: {puzzleId}, Difficulty: {self.difficulty}")
         else:
             self.statusLabel.configure(text="Custom Board State")
 
-        self.sudokuGrid = SudokuGrid(self, self.game.boardState)
+        self.sudokuGrid = SudokuGrid(self, self.game.boardState, self.solution)
         self.sudokuGrid.grid(row=1, column=0)
 
         self.controls = SudokuControls(self, root=self.master, updateSelectedCellCommand=self.updateSelectedCellValue, undoCommand=self.__undo, redoCommand=self.__redo)
@@ -67,7 +93,7 @@ class SudokuPage(ctk.CTkFrame):
         self.hintsFrame.grid_columnconfigure(0, weight=1) # AI generated (line only) - https://chatgpt.com/share/6a95e88c-7674-83eb-a59f-7a501973d802
         self.hintsFrame.grid_rowconfigure(1, weight=1)
 
-        self.feed = SudokuFeed(self.hintsFrame, self.game.boardState, applyCommand=self.applyTechnique)
+        self.feed = SudokuFeed(self.hintsFrame, self.game.boardState, self.solution, applyCommand=self.applyTechnique)
         self.feed.grid(row=1, column=0, sticky="nsew")
 
         self.hintMenu = SudokuHintMenu(self.hintsFrame, lambda: self.game.boardState, self.feed.addHint)

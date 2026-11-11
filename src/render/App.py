@@ -1,3 +1,4 @@
+import sqlite3
 from typing import Tuple
 from src.analysis.Technique import Technique
 from src.core.BoardState import BoardState
@@ -41,19 +42,41 @@ class App(ctk.CTk):
                 profileId=self.profileId,
                 loadBoardStateCommand=self.loadBoardStatePuzzle,
                 techniquesPageCommand=self.techniquesPage,
-                accountsPageCommand=self.accountsPage
+                accountsPageCommand=self.accountsPage,
+                loadPuzzleFromIdCommand=self.loadPuzzleFromId
             )
         )
 
-    def loadBoardStatePuzzle(self, boardState: BoardState, puzzleId: int, clueCount: int, difficulty: float):
+    def loadBoardStatePuzzle(self, boardState: BoardState, puzzleId: int = -1):
         self.__setPage(
             SudokuPage(
                 self,
                 boardState,
                 mainMenuCommand=self.mainMenu,
+                puzzleId=puzzleId
+            )
+        )
+
+    def loadPuzzleFromId(self, puzzleId: int):
+        conn = sqlite3.connect("sudoku.db")
+        cur = conn.cursor()
+        cur.execute("""
+            SELECT SerialisedBoard, SerialisedSolution
+            FROM Puzzles
+            WHERE PuzzleID = ?
+        """, (puzzleId,))
+
+        board, solution = cur.fetchone()
+        board = BoardState.deserialise(board)
+        solution = BoardState.deserialise(solution)
+        
+        self.__setPage(
+            SudokuPage(
+                self,
+                board,
+                mainMenuCommand=self.mainMenu,
                 puzzleId=puzzleId,
-                clueCount=clueCount,
-                difficulty=difficulty
+                customSolution=solution
             )
         )
 
@@ -71,7 +94,7 @@ class App(ctk.CTk):
             TechniquesLibraryPage(
                 self,
                 mainMenuCommand=self.mainMenu,
-                loadBoardStateCommand=self.loadBoardStatePuzzle,
+                loadPuzzleIdCommand=self.loadPuzzleFromId,
                 techniquePageCommand=self.learnSpecificTechnique
             )
         )

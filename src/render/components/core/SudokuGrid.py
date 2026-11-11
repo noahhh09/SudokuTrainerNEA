@@ -8,10 +8,11 @@ from src.core.BoardState import BoardState
 from src.core.Cell import Cell
 
 class SudokuGrid(ctk.CTkFrame):
-    def __init__(self, master: Any, boardState: BoardState, width: int = 640, height: int = 640, **kwargs):
+    def __init__(self, master: Any, boardState: BoardState, solution: BoardState | None = None, width: int = 640, height: int = 640, **kwargs):
         super().__init__(master, width, height, fg_color="black", **kwargs)
 
         self.boardState = boardState
+        self.solution = solution
         self.sudokuCells: list[list[SudokuCell]] = []
         self.selectedCellPosition: tuple[int | None, int | None] = (None, None)
 
@@ -42,11 +43,15 @@ class SudokuGrid(ctk.CTkFrame):
         for i in range(9):
             for j in range(9):
                 self.sudokuCells[i][j].redraw(self.boardState.getCell(i, j))
+                self.sudokuCells[i][j].highlight("white")
 
+        self.updateInconsistenciesWithSolution()
         self.updateContradictions()
 
     def redrawCell(self, row: int, col: int):
         self.sudokuCells[row][col].redraw(self.boardState.getCell(row, col))
+        self.sudokuCells[row][col].highlight("white")
+        self.updateInconsistenciesWithSolution()
         self.updateContradictions()
 
     def updateContradictions(self):
@@ -60,8 +65,24 @@ class SudokuGrid(ctk.CTkFrame):
             for j in range(9):
                 hasContra = (i, j) in cellsWithContradictions
 
-                colour = "#ff0000" if hasContra else "white"
-                self.sudokuCells[i][j].highlight(colour)
+                if hasContra:
+                    self.sudokuCells[i][j].highlight("#ff0000")
+
+    def updateInconsistenciesWithSolution(self):
+        if self.solution is None:
+            return
+
+        for i in range(9):
+            for j in range(9):
+                cell = self.boardState.getCell(i, j)
+                entered = cell.getValue()
+                if not cell.isEditable() or entered == None:
+                    continue
+
+                solution = self.solution.getCell(i, j).getValue()
+                print(solution)
+                if solution != entered:
+                    self.sudokuCells[i][j].highlight("#ff7700")
 
 
 class SudokuCell(ctk.CTkFrame):
