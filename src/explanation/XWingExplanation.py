@@ -14,6 +14,7 @@ class XWingExplanation(TechniqueExplanation):
         exampleRowCol = self.technique.baseUnits[0].getBoardPosition(self.technique.coverUnits[0].unitIndex)
         complementaryRowCol = self.technique.baseUnits[1].getBoardPosition(self.technique.coverUnits[1].unitIndex)
         digit = self.technique.digit
+        coverDirection = self.technique.coverUnits[0].unitType
 
         return [
             ShowText("X-Wings are powerful techniques that make use of two parallel 'base units'. When the same candidate appears in both base units, and also in the same complementary unit (e.g. if the base units were rows, then columns), then other instances of the candidate in those complementary units can be eliminated. Let's take a look."),
@@ -38,9 +39,9 @@ class XWingExplanation(TechniqueExplanation):
                 PopulateLogicalCandidatesInCells("", self.technique.baseUnits[0]),
                 PopulateLogicalCandidatesInCells("", self.technique.baseUnits[1]),
                 HighlightCells("", self.technique.causalPositions),
-                ShowText(f"This means that the {digit} digit must be in one of these two cells inside each {self.technique.baseDirection.name}. What does this mean for other cells in each {self.technique.baseDirection.name}?"),
+                ShowText(f"This means that the {digit} digit must be in one of these two cells inside each {self.technique.baseDirection.name}. What does this mean for other cells in each {coverDirection.name} they belong to?"),
             ], stackable=True),
-            ApplyMoves(f"Since the {digit} digit is locked to these cells, any other instance in each {self.technique.coverUnits[0].unitType.name} can be eliminated.", self.technique.moves, stackable=True),
+            ApplyMoves(f"Since the {digit} digit is locked to these cells, any other instance in each {coverDirection.name} can be eliminated.", self.technique.moves, stackable=True),
             Steps([
                 PopulateLogicalCandidatesInCells("", self.technique.baseUnits[0]),
                 PopulateLogicalCandidatesInCells("", self.technique.baseUnits[1]),
