@@ -9,7 +9,7 @@ from pathlib import Path
 import pandas as pd
 import sqlite3
 
-from src.analysis import ALL_TECHNIQUE_TYPES
+from src.analysis import ALL_TECHNIQUE_TYPES, BoardUtils
 from src.core.BoardState import BoardState
 
 # Applying tags takes quite a while. Approx 40 boards per second when filtering unsolvable boards and applying first state tags.
@@ -65,9 +65,11 @@ def applyTags(row):
     boardState = BoardState.deserialise(row["SerialisedBoard"])
     tags = []
 
+    boardState = BoardUtils.copyAndPopulateCandidates(boardState)
+
     # Apply tags for techniques available in the initial board state.
     for technique in ALL_TECHNIQUE_TYPES:
-        if len(technique.findAvailable(boardState)) >= 1:
+        if len(technique.findAvailable(boardState, generateCandidatesState=False)) >= 1:
             tags.append(technique.__name__)
 
     # Repeatedly apply techniques available to determine if the board can be solved using the implemented techniques.
@@ -75,7 +77,7 @@ def applyTags(row):
         found = False
 
         for technique in ALL_TECHNIQUE_TYPES:
-            available = technique.findAvailable(boardState)
+            available = technique.findAvailable(boardState, generateCandidatesState=False)
             if len(available) > 0:
                 found = True
                 for move in available[0].moves:

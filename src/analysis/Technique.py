@@ -9,7 +9,7 @@ class Technique:
         self.moves = moves
 
     @classmethod # Similar to static methods, but allows class variables to be accessed (useful for multi-degree classes, like NakedGroup). https://www.geeksforgeeks.org/python/classmethod-in-python/
-    def findAvailable(cls, state: BoardState) -> list[Technique]:
+    def findAvailable(cls, state: BoardState, generateCandidatesState: bool = True) -> list[Technique]:
         raise NotImplementedError()
 
     def identity(self) -> str:

@@ -42,8 +42,11 @@ class PointingGroup(Technique):
     #       -> if len(that) == 1, we have a potential pointing group
     #       -> if any possible eliminations, pointing group!
     @classmethod
-    def findAvailable(cls, state: BoardState) -> list[Technique]:
-        candidatesState = BoardUtils.copyAndPopulateCandidates(state)
+    def findAvailable(cls, state: BoardState, generateCandidatesState: bool = True) -> list[Technique]:
+        candidatesState = state
+        if generateCandidatesState:
+            candidatesState = BoardUtils.copyAndPopulateCandidates(state)
+            
         found: list[Technique] = []
 
         for k in range(9):

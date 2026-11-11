@@ -32,8 +32,11 @@ class NakedGroup(Technique):
         }
 
     @classmethod # In instances such as this, @classmethod becomes incredibly useful, because the code does not have to be rewritten for each degree of naked group technique.
-    def findAvailable(cls, state: BoardState) -> list[Technique]:
-        candidatesState = BoardUtils.copyAndPopulateCandidates(state)
+    def findAvailable(cls, state: BoardState, generateCandidatesState: bool = True) -> list[Technique]:
+        candidatesState = state
+        if generateCandidatesState:
+            candidatesState = BoardUtils.copyAndPopulateCandidates(state)
+            
         units = BoardUtils.getAllUnits(candidatesState)
 
         found: list[Technique] = []

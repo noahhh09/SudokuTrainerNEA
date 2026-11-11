@@ -28,10 +28,13 @@ class HiddenSingle(Technique):
         }
 
     @classmethod
-    def findAvailable(cls, state: BoardState) -> list[Technique]:
+    def findAvailable(cls, state: BoardState, generateCandidatesState: bool = True) -> list[Technique]:
+        candidateState = state
+        if generateCandidatesState:
+            candidateState = BoardUtils.copyAndPopulateCandidates(state)
+
         found: list[Technique] = []
 
-        candidateState = BoardUtils.copyAndPopulateCandidates(state)
         units = BoardUtils.getAllUnits(candidateState)
 
         for unit in units:

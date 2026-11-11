@@ -29,8 +29,11 @@ class XWing(Technique):
         }
 
     @classmethod
-    def findAvailable(cls, state: BoardState) -> list[Technique]:
-        candidateState = BoardUtils.copyAndPopulateCandidates(state)
+    def findAvailable(cls, state: BoardState, generateCandidatesState: bool = True) -> list[Technique]:
+        candidateState = state
+        if generateCandidatesState:
+            candidateState = BoardUtils.copyAndPopulateCandidates(state)
+            
         found = []
 
         rowUnits = BoardUtils.getUnitsOfKind(candidateState, UnitType.Row)

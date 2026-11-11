@@ -37,9 +37,12 @@ class HiddenGroup(Technique):
     # - Calculate union of each pair intersection. 
     # - If len(union) == degree, then check if the intersection with all other cells is empty.
     @classmethod # ChatGPT made me aware of the @classmethod decorator, but I researched it after the fact and deduced it was a good idea to pass up on. Everything else implemented by self.
-    def findAvailable(cls, state: BoardState) -> list[Technique]:
+    def findAvailable(cls, state: BoardState, generateCandidatesState: bool = True) -> list[Technique]:
+        candidateState = state
+        if generateCandidatesState:
+            candidateState = BoardUtils.copyAndPopulateCandidates(state)
+
         degree = cls.degree # Allows very easy creation of class-specific types.
-        candidateState = BoardUtils.copyAndPopulateCandidates(state)
         units = BoardUtils.getAllUnits(candidateState)
 
         found: list[Technique] = []
