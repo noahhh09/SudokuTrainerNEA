@@ -44,7 +44,7 @@ class TechniqueLearningPage(ctk.CTkFrame):
         self.mainMenuButton = ctk.CTkButton(self, text="Back to Main Menu", width=200, height=50, command=mainMenuCommand)
         self.mainMenuButton.grid(row=0, column=0, sticky="w", padx=(5, 0), pady=10)
 
-        self.sudokuGrid = SudokuGrid(self, boardState) # Grid is not interactable without SudokuControls, so this is good for show.
+        self.sudokuGrid = SudokuGrid(self, boardState, allowInteraction=False) # Grid is not interactable without SudokuControls, so this is good for show.
         self.sudokuGrid.grid(row=1, column=0, padx=(5, 0), rowspan=2)
 
         titleFont = ctk.CTkFont(weight="bold", size=36)

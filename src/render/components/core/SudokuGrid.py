@@ -21,11 +21,12 @@ CANDIDATE_COLOUR = "#444444"
 ELIMINATION_COLOUR = "#ff0000"
 
 class SudokuGrid(ctk.CTkFrame):
-    def __init__(self, master: Any, boardState: BoardState, solution: BoardState | None = None, width: int = 640, height: int = 640, **kwargs):
+    def __init__(self, master: Any, boardState: BoardState, solution: BoardState | None = None, allowInteraction: bool = True, width: int = 640, height: int = 640, **kwargs):
         super().__init__(master, width, height, fg_color="black", **kwargs)
 
         self.boardState = boardState
         self.solution = solution
+        self.allowInteraction = allowInteraction
         self.sudokuCells: list[list[SudokuCell]] = []
         self.selectedCellPosition: tuple[int, int] | tuple[None, None] = (None, None)
         self.selectedDigit: int | None = None
@@ -51,6 +52,9 @@ class SudokuGrid(ctk.CTkFrame):
             self.sudokuCells[row][col].highlight(colour)
 
     def selectCell(self, row, col):
+        if not self.allowInteraction:
+            return
+        
         self.selectedCellPosition = (row, col)
         self.selectedDigit = self.boardState.getCell(row, col).getValue()
         for i in range(9):
