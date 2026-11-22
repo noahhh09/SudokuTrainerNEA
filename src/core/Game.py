@@ -3,10 +3,10 @@ from .Stack import Stack
 from .BoardState import BoardState
 
 class Game:
-    def __init__(self, state: BoardState, undoStack = Stack(), redoStack = Stack(), mistakeCount = 0, hintsUsed = 0, timeElapsed = 0) -> None:
+    def __init__(self, state: BoardState, mistakeCount = 0, hintsUsed = 0, timeElapsed = 0) -> None:
         self.boardState = state
-        self.undoStack = undoStack
-        self.redoStack = redoStack
+        self.undoStack = Stack()
+        self.redoStack = Stack()
         self.mistakeCount = mistakeCount
         self.hintsUsed = hintsUsed
         self.timeElapsed = timeElapsed
