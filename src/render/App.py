@@ -131,9 +131,9 @@ class App(ctk.CTk):
             CREATE TABLE IF NOT EXISTS Profiles ( 
                 ProfileID INTEGER PRIMARY KEY AUTOINCREMENT, 
                 Name TEXT NOT NULL UNIQUE,
-                CreatedAt TIMESTAMP
-            ); 
-        """)
+                CreatedAt TIMESTAMP DEFAULT (unixepoch())
+            );
+        """) # Thank you https://stackoverflow.com/questions/11556546/sqlite-storing-default-timestamp-as-unixepoch
 
         conn.execute("""
             CREATE TABLE IF NOT EXISTS Games ( 
