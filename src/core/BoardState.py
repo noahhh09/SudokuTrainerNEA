@@ -25,6 +25,7 @@ class BoardState:
 
         return result
 
+    # Deprecated. Use BoardUtils.
     def getBlockIndex(self, row: int, col: int) -> int:
         return (row // 3) * 3 + col // 3
 

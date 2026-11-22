@@ -3,7 +3,7 @@ from typing import Any
 import customtkinter as ctk
 import tkinter as tk
 
-from src.analysis import Contradictions
+from src.analysis import BoardUtils, Contradictions
 from src.core.BoardState import BoardState
 from src.core.Cell import Cell
 
@@ -11,6 +11,8 @@ from src.core.Cell import Cell
 DEFAULT_HIGHLIGHT = "white"
 CONTRADICTION_HIGHLIGHT = "#ff0000"
 INCONSISTENCY_HIGHLIGHT = "#ff7700"
+SELECTED_HIGHLIGHT = "#2761ff"
+SIMILAR_CELL_SELECTED_HIGHLIGHT = "#507eff"
 
 EDITABLE_COLOUR = "#1111ff"
 UNEDITABLE_COLOUR = "#000000"
@@ -49,22 +51,26 @@ class SudokuGrid(ctk.CTkFrame):
 
     def selectCell(self, row, col):
         self.selectedCellPosition = (row, col)
-        print("Selected", row, col)
+        for i in range(9):
+            for j in range(9):
+                self.sudokuCells[i][j].updateHighlightState((row, col))
 
     def redraw(self):
+        self.updateInconsistenciesWithSolution()
+        self.updateContradictions()
+
         for i in range(9):
             for j in range(9):
                 self.sudokuCells[i][j].redraw(self.boardState.getCell(i, j))
-                self.sudokuCells[i][j].highlight(DEFAULT_HIGHLIGHT)
+                self.sudokuCells[i][j].updateHighlightState(self.selectedCellPosition)
 
-        self.updateInconsistenciesWithSolution()
-        self.updateContradictions()
 
     def redrawCell(self, row: int, col: int):
-        self.sudokuCells[row][col].redraw(self.boardState.getCell(row, col))
-        self.sudokuCells[row][col].highlight(DEFAULT_HIGHLIGHT)
         self.updateInconsistenciesWithSolution()
         self.updateContradictions()
+
+        self.sudokuCells[row][col].redraw(self.boardState.getCell(row, col))
+        self.sudokuCells[row][col].updateHighlightState(self.selectedCellPosition)
 
     def updateContradictions(self):
         contradictions = Contradictions.detectContradictions(self.boardState)
@@ -76,10 +82,8 @@ class SudokuGrid(ctk.CTkFrame):
         for i in range(9):
             for j in range(9):
                 hasContra = (i, j) in cellsWithContradictions
-
-                if hasContra:
-                    self.sudokuCells[i][j].highlight(CONTRADICTION_HIGHLIGHT)
-
+                self.sudokuCells[i][j].isContradictory = hasContra
+                    
     def updateInconsistenciesWithSolution(self):
         if self.solution is None:
             return
@@ -88,12 +92,15 @@ class SudokuGrid(ctk.CTkFrame):
             for j in range(9):
                 cell = self.boardState.getCell(i, j)
                 enteredValue = cell.getValue()
-                if not cell.isEditable() or enteredValue == None:
+                if not cell.isEditable():
+                    continue
+                elif enteredValue is None:
+                    self.sudokuCells[i][j].isInconsistentWithSolution = False # Only flag as contradictory if the user has inputted a value, and it is wrong.
                     continue
 
                 solutionValue = self.solution.getCell(i, j).getValue()
-                if solutionValue != enteredValue:
-                    self.sudokuCells[i][j].highlight(INCONSISTENCY_HIGHLIGHT)
+                isContradictory = solutionValue != enteredValue 
+                self.sudokuCells[i][j].isInconsistentWithSolution = isContradictory
 
 
 class SudokuCell(ctk.CTkFrame):
@@ -103,6 +110,9 @@ class SudokuCell(ctk.CTkFrame):
 
     def __init__(self, master: Any, row: int, col: int, cell: Cell, onSelectCallback, size=64, **kwargs):
         super().__init__(master, width=size, height=size, **kwargs)
+
+        self.isContradictory = False
+        self.isInconsistentWithSolution = False
 
         self.row = row
         self.col = col
@@ -121,6 +131,36 @@ class SudokuCell(ctk.CTkFrame):
         self.canvas = tk.Canvas(self, width=self.size, height=self.size)
         self.canvas.pack()
         self.canvas.bind("<Button-1>", self._onClick)
+
+    def updateHighlightState(self, selectedPos: tuple[int, int] | tuple[None, None]):
+        selectedRow, selectedCol = selectedPos
+        similarCellSelected = False
+        cellSelected = False
+
+        if selectedRow is not None and selectedCol is not None:
+            if selectedRow == self.row and selectedCol == self.col:
+                cellSelected = True
+            else:
+                thisBlockIdx = BoardUtils.getBlockIndex(self.row, self.col)
+                selectedBlockIdx = BoardUtils.getBlockIndex(selectedRow, selectedCol)
+                
+                similarCellSelected = (
+                    thisBlockIdx == selectedBlockIdx or
+                    self.row == selectedRow or
+                    self.col == selectedCol
+                )
+
+        # Highest priority at the top.
+        if self.isContradictory:
+            self.highlight(CONTRADICTION_HIGHLIGHT)
+        elif self.isInconsistentWithSolution:
+            self.highlight(INCONSISTENCY_HIGHLIGHT)
+        elif cellSelected:
+            self.highlight(SELECTED_HIGHLIGHT)
+        elif similarCellSelected:
+            self.highlight(SIMILAR_CELL_SELECTED_HIGHLIGHT)
+        else:
+            self.highlight(DEFAULT_HIGHLIGHT) # Fallback to default. Used in case it was previously highlighted something else and no longer should be.
 
     def highlight(self, colour: str):
         self.canvas.configure(bg=colour)

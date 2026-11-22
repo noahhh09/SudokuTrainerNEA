@@ -163,3 +163,6 @@ def findCandidateDigitOccurrences(unit: Unit, upperBound: int = 9) -> dict[int, 
         }
 
     return digitOccurrences
+
+def getBlockIndex(row: int, col: int) -> int:
+    return (row // 3) * 3 + col // 3
