@@ -35,6 +35,7 @@ class MainMenuPage(ctk.CTkFrame):
         self.titleLabel = ctk.CTkLabel(self, text="Learn Sudoku", font=self.titleFont)
         self.titleLabel.place(relx=0.5, rely=0.2, anchor="center")
 
+        # This default shouldn't ever be shown, but just in case, this warning is kept.
         accountText = "You have not selected a profile. Progress will not be tracked."
         if profileId is not None:
             conn = sqlite3.connect("sudoku.db")
@@ -99,7 +100,7 @@ class MainMenuPage(ctk.CTkFrame):
         self.techniquesButton = ctk.CTkButton(self, text="Techniques Library", font=self.buttonFont, width=400, height=100, command=techniquesPageCommand)
         self.techniquesButton.place(relx=0.5, rely=0.65, anchor="center")
 
-        self.accountButton = ctk.CTkButton(self, text="Account and Stats", font=self.buttonFont, width=400, height=100, command=accountsPageCommand)
+        self.accountButton = ctk.CTkButton(self, text="Profile and Settings", font=self.buttonFont, width=400, height=100, command=accountsPageCommand)
         self.accountButton.place(relx=0.5, rely=0.8, anchor="center")
 
         if DEV_MODE:

@@ -7,6 +7,7 @@ class AccountsPageLoggedIn(ctk.CTkFrame):
     def __init__(self, master: Any, profileId: int, mainMenuCommand, setAccountIdCommand, accountsPageCommand):
         super().__init__(master)
 
+        self.profileId = profileId
         self.mainMenuCommand = mainMenuCommand
         self.setAccountIdCommand = setAccountIdCommand
         self.accountsPageCommand = accountsPageCommand
@@ -42,12 +43,20 @@ class AccountsPageLoggedIn(ctk.CTkFrame):
         toggle3.set(True)
         toggle3.place(relx=0.5, rely=0.4, anchor="center")
 
+        toggle4 = ctk.CTkSwitch(self, text="Highlight selected units")
+        toggle4.set(True)
+        toggle4.place(relx=0.5, rely=0.45, anchor="center")
+
+        toggle5 = ctk.CTkSwitch(self, text="Highlight instances of the selected digit")
+        toggle5.set(True)
+        toggle5.place(relx=0.5, rely=0.5, anchor="center")
+
         mainMenuButton = ctk.CTkButton(self, text="Back to Main Menu", command=mainMenuCommand)
         mainMenuButton.place(relx=0.4, rely=0.7, anchor="center")
 
         self.logoutButton = ctk.CTkButton(self, text="Log Out", command=self.logout)
-        self.logoutButton.place(relx=0.6, rely=0.7, anchor="center")
+        self.logoutButton.place(relx=0.6, rely=0.7, anchor="center")      
 
     def logout(self):
         self.setAccountIdCommand(None)
-        self.mainMenuCommand()
+        self.accountsPageCommand()

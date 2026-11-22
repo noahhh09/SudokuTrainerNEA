@@ -8,14 +8,16 @@ from src.render.components.ConfirmDeleteButton import ConfirmDeleteButton
 class AccountsPageLoggedOut(ctk.CTkFrame):
     def __init__(self, master: Any, mainMenuCommand, setAccountIdCommand, accountsPageCommand):
         super().__init__(master)
+        self.mainMenuCommand = mainMenuCommand
         self.setIdCommand = setAccountIdCommand
         self.accountsPageCommand = accountsPageCommand
 
         self.grid_rowconfigure(1, weight=1)
         self.grid_columnconfigure((0,1,2), weight=1)
 
-        mainMenuButton = ctk.CTkButton(self, text="Back to Main Menu", width=200, height=50, command=mainMenuCommand)
-        mainMenuButton.grid(row=0, column=0, sticky="w", padx=(5, 0), pady=10, columnspan=3)
+        # Removed after deciding to require a profile to play.
+        # mainMenuButton = ctk.CTkButton(self, text="Back to Main Menu", width=200, height=50, command=mainMenuCommand)
+        # mainMenuButton.grid(row=0, column=0, sticky="w", padx=(5, 0), pady=10, columnspan=3)
 
         headerFont = ctk.CTkFont(size=24, weight="bold")
 
@@ -84,7 +86,7 @@ class AccountsPageLoggedOut(ctk.CTkFrame):
 
     def selectProfile(self, id):
         self.setIdCommand(id)
-        self.accountsPageCommand()
+        self.mainMenuCommand()
 
     def deleteProfile(self, id):
         conn = sqlite3.connect("sudoku.db")

@@ -18,6 +18,7 @@ WIDTH = 1440
 class App(ctk.CTk):
     def __init__(self, fg_color: str | Tuple[str, str] | None = None, **kwargs):
         super().__init__(fg_color, **kwargs)
+        self._initDatabases()
 
         self.profileId: int | None = None
 
@@ -26,7 +27,7 @@ class App(ctk.CTk):
 
         self.page: ctk.CTkFrame | None = None
 
-        self.mainMenu()
+        self.accountsPage()
 
     def __setPage(self, page: ctk.CTkFrame):
         if self.page is not None:
@@ -122,3 +123,40 @@ class App(ctk.CTk):
 
     def setProfileId(self, id):
         self.profileId = id
+
+    def _initDatabases(self):
+        conn = sqlite3.connect("sudoku.db")
+
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS Profiles ( 
+                ProfileID INTEGER PRIMARY KEY AUTOINCREMENT, 
+                Name TEXT NOT NULL UNIQUE,
+                CreatedAt TIMESTAMP
+            ); 
+        """)
+
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS Games ( 
+                GameID INTEGER PRIMARY KEY AUTOINCREMENT, 
+                ProfileID INTEGER NOT NULL, 
+                PuzzleID INTEGER,
+                InitialBoardSerialised TEXT,
+                IsCompletedOrDiscarded BOOLEAN, 
+                GameType TEXT
+            );
+        """)
+
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS Moves ( 
+                GameID INTEGER, 
+                MoveNumber INTEGER, 
+                RowNum INTEGER NOT NULL, 
+                ColNum INTEGER NOT NULL, 
+                MoveType TEXT, 
+                MoveData TEXT, 
+                PRIMARY KEY (GameID, MoveNumber)
+            ); 
+        """)
+
+        conn.commit()
+        conn.close()

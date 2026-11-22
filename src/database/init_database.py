@@ -29,7 +29,7 @@ PRINT_INTERVAL = (PUZZLE_LOAD_COUNT // 100) + 1 # Avoids division by 0 errors.
 # Converts from the string type used in the Kaggle database to the board string system used throughout the project.
 # The kaggle dataset uses this format: "a string of 81 characters. Periods indicate unknown values." e.g. 1..5.37..6.3 and so on.
 def convertPuzzleString(puzzle: int | str):
-    puzzle = str(puzzle) # pandas can treat the Kaggle solution strings as integers, as it is just 81 numbers
+    puzzle = str(puzzle) # pandas treats the Kaggle solution strings as integers because it 81 numbers raw, so this fixes that.
     result = ""
     consequtiveZeroes = 0
 
