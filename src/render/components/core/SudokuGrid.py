@@ -28,6 +28,7 @@ class SudokuGrid(ctk.CTkFrame):
         self.solution = solution
         self.sudokuCells: list[list[SudokuCell]] = []
         self.selectedCellPosition: tuple[int, int] | tuple[None, None] = (None, None)
+        self.selectedDigit: int | None = None
 
         for i in range(9):
             row: list[SudokuCell] = []
@@ -51,9 +52,10 @@ class SudokuGrid(ctk.CTkFrame):
 
     def selectCell(self, row, col):
         self.selectedCellPosition = (row, col)
+        self.selectedDigit = self.boardState.getCell(row, col).getValue()
         for i in range(9):
             for j in range(9):
-                self.sudokuCells[i][j].updateHighlightState((row, col))
+                self.sudokuCells[i][j].updateHighlightState(self.selectedCellPosition, self.selectedDigit)
 
     def redraw(self):
         self.updateInconsistenciesWithSolution()
@@ -62,7 +64,7 @@ class SudokuGrid(ctk.CTkFrame):
         for i in range(9):
             for j in range(9):
                 self.sudokuCells[i][j].redraw(self.boardState.getCell(i, j))
-                self.sudokuCells[i][j].updateHighlightState(self.selectedCellPosition)
+                self.sudokuCells[i][j].updateHighlightState(self.selectedCellPosition, self.selectedDigit)
 
 
     def redrawCell(self, row: int, col: int):
@@ -70,7 +72,7 @@ class SudokuGrid(ctk.CTkFrame):
         self.updateContradictions()
 
         self.sudokuCells[row][col].redraw(self.boardState.getCell(row, col))
-        self.sudokuCells[row][col].updateHighlightState(self.selectedCellPosition)
+        self.sudokuCells[row][col].updateHighlightState(self.selectedCellPosition, self.selectedDigit)
 
     def updateContradictions(self):
         contradictions = Contradictions.detectContradictions(self.boardState)
@@ -132,11 +134,13 @@ class SudokuCell(ctk.CTkFrame):
         self.canvas.pack()
         self.canvas.bind("<Button-1>", self._onClick)
 
-    def updateHighlightState(self, selectedPos: tuple[int, int] | tuple[None, None]):
+    def updateHighlightState(self, selectedPos: tuple[int, int] | tuple[None, None], selectedDigit: int | None):
         selectedRow, selectedCol = selectedPos
         similarCellSelected = False
         cellSelected = False
-
+        value = self.cell.getValue()
+        digitSelected = value is not None and selectedDigit == value
+            
         if selectedRow is not None and selectedCol is not None:
             if selectedRow == self.row and selectedCol == self.col:
                 cellSelected = True
@@ -157,7 +161,7 @@ class SudokuCell(ctk.CTkFrame):
             self.highlight(INCONSISTENCY_HIGHLIGHT)
         elif cellSelected:
             self.highlight(SELECTED_HIGHLIGHT)
-        elif similarCellSelected:
+        elif similarCellSelected or digitSelected:
             self.highlight(SIMILAR_CELL_SELECTED_HIGHLIGHT)
         else:
             self.highlight(DEFAULT_HIGHLIGHT) # Fallback to default. Used in case it was previously highlighted something else and no longer should be.
