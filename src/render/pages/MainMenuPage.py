@@ -56,7 +56,7 @@ class MainMenuPage(ctk.CTkFrame):
         self.newPuzzleButton = ctk.CTkButton(self, text="New Puzzle", font=self.buttonFont, width=400, height=100, command=self.newPuzzle)
         self.newPuzzleButton.place(relx=0.5, rely=0.4, anchor="center")
 
-        ### Objective 3.DIFFICULTY SELECT
+        ### Objective 3. DIFFICULTY SELECT
 
         minDiff, maxDiff = self.getAvailableDifficultyRange()
 
@@ -75,13 +75,32 @@ class MainMenuPage(ctk.CTkFrame):
         self.maxDiffLabel = ctk.CTkLabel(self.difficultySelectFrame, text=str(maxDiff))
         self.maxDiffLabel.grid(row=0, column=3, padx=(0, 5))
 
+        ### Objective 3. SELECT NUMBER OF GIVENS (CLUES)
+
+        minClues, maxClues = self.getAvailableClueRange()
+
+        self.cluesSelectFrame = ctk.CTkFrame(self)
+        self.cluesSelectFrame.place(relx=0.5, rely=0.55, anchor="center")
+
+        self.cluesLabel = ctk.CTkLabel(self.cluesSelectFrame, text="Given Digits", font=ctk.CTkFont(weight='bold'))
+        self.cluesLabel.grid(row=0, column=0, padx=(5, 0))
+
+        self.minClueLabel = ctk.CTkLabel(self.cluesSelectFrame, text=str(minClues))
+        self.minClueLabel.grid(row=0, column=1, padx=(5, 0))
+
+        self.clueSlider = CTkRangeSlider(self.cluesSelectFrame, from_=minClues, to=maxClues, command=self.updateClueSliderLabels)
+        self.clueSlider.grid(row=0, column=2, padx=5)
+
+        self.maxCluesLabel = ctk.CTkLabel(self.cluesSelectFrame, text=str(maxClues))
+        self.maxCluesLabel.grid(row=0, column=3, padx=(0, 5))
+
         ### EVERYTHING ELSE
 
         self.techniquesButton = ctk.CTkButton(self, text="Techniques Library", font=self.buttonFont, width=400, height=100, command=techniquesPageCommand)
         self.techniquesButton.place(relx=0.5, rely=0.65, anchor="center")
 
         self.accountButton = ctk.CTkButton(self, text="Account and Stats", font=self.buttonFont, width=400, height=100, command=accountsPageCommand)
-        self.accountButton.place(relx=0.5, rely=0.85, anchor="center")
+        self.accountButton.place(relx=0.5, rely=0.8, anchor="center")
 
         if DEV_MODE:
             boardInputVar = tk.StringVar()
@@ -92,6 +111,7 @@ class MainMenuPage(ctk.CTkFrame):
 
     def newPuzzle(self):
         minDiff, maxDiff = self.getSelectedDifficultyRange()
+        minClues, maxClues = self.getSelectedClueRange()
         
         conn = sqlite3.connect("sudoku.db")
         cur = conn.cursor()
@@ -104,7 +124,9 @@ class MainMenuPage(ctk.CTkFrame):
                 WHERE TAG ='solvable'
                 AND difficulty >= ?
                 AND difficulty <= ?
-            """, (minDiff, maxDiff))
+                AND clues >= ?
+                AND clues <= ?
+            """, (minDiff, maxDiff, minClues, maxClues))
         except sqlite3.OperationalError as err:
             print("Puzzles table not created.")
             self.accountLabel.configure(text="No puzzles found! Have you set up the puzzle database yet? See README.md for more info.")
@@ -147,10 +169,40 @@ class MainMenuPage(ctk.CTkFrame):
 
     def getSelectedDifficultyRange(self):
         minDiff, maxDiff = self.difficultySlider.get()
-        return (minDiff // 1) / 10, (maxDiff // 1) / 10
+        return (minDiff // 1) / 10, (maxDiff // 1) / 10 # 1 d.p.
 
     def updateDifficultySliderLabels(self, argument):
         minDiff, maxDiff = self.getSelectedDifficultyRange()
 
         self.minDiffLabel.configure(text=str(minDiff))
         self.maxDiffLabel.configure(text=str(maxDiff))
+
+    def getAvailableClueRange(self) -> tuple[int, int]:
+        conn = sqlite3.connect("sudoku.db")
+        cur = conn.cursor()
+
+        try:
+            # Thank you https://stackoverflow.com/questions/45061067/select-the-row-with-maximum-minimum-value-in-sqlite for help MIN() and MAX() syntax.
+            cur.execute("""
+                SELECT MIN(clues), MAX(clues)
+                FROM Puzzles
+                INNER JOIN PuzzleTags
+                    ON Puzzles.PuzzleID = PuzzleTags.PuzzleID
+                WHERE PuzzleTags.Tag = 'solvable'
+            """)
+
+            return cur.fetchone()
+        except sqlite3.OperationalError:
+            print("Couldn't determine maximum and minimum clue count of Puzzles. Did you run init_database.py?")
+        
+        return (0, 1)
+
+    def getSelectedClueRange(self):
+        minClues, maxClues = self.clueSlider.get()
+        return int(minClues), int(maxClues)
+
+    def updateClueSliderLabels(self, argument):
+        minClues, maxClues = self.getSelectedClueRange()
+
+        self.minClueLabel.configure(text=str(minClues))
+        self.maxCluesLabel.configure(text=str(maxClues))
