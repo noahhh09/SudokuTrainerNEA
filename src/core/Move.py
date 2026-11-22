@@ -24,13 +24,13 @@ class Move:
 
 
 class ValueChangeMove(Move):
-    def __init__(self, row: int, col: int, newValue: int | None) -> None:
+    def __init__(self, row: int, col: int, newValue: int | None, oldValue: int | None = None, removedCandidatePositions: list[tuple[int, int]] = []) -> None:
         super().__init__(row, col)
         self.newValue = newValue
 
-        self.oldValue: int | None = None
+        self.oldValue: int | None = oldValue
         self.applied = False
-        self.removedCandidatePositions: list[tuple[int, int]] = []
+        self.removedCandidatePositions: list[tuple[int, int]] = removedCandidatePositions
 
     def apply(self, board: BoardState):
         cell = board.getCell(self.row, self.col)

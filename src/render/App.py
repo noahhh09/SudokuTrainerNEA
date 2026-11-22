@@ -2,6 +2,7 @@ import sqlite3
 from typing import Tuple
 from src.analysis.Technique import Technique
 from src.core.BoardState import BoardState
+from src.database import DatabaseHandler
 from src.render.pages.AccountsPageLoggedIn import AccountsPageLoggedIn
 from src.render.pages.AccountsPageLoggedOut import AccountsPageLoggedOut
 from src.render.pages.MainMenuPage import MainMenuPage
@@ -44,7 +45,8 @@ class App(ctk.CTk):
                 loadBoardStateCommand=self.loadBoardStatePuzzle,
                 techniquesPageCommand=self.techniquesPage,
                 accountsPageCommand=self.accountsPage,
-                loadPuzzleFromIdCommand=self.loadPuzzleFromId
+                loadPuzzleFromIdCommand=self.loadPuzzleFromId,
+                loadActiveBoardFromGameIdCommand=self.loadActiveBoardFromGameID
             )
         )
 
@@ -62,22 +64,33 @@ class App(ctk.CTk):
         conn = sqlite3.connect("sudoku.db")
         cur = conn.cursor()
         cur.execute("""
-            SELECT SerialisedBoard, SerialisedSolution
+            SELECT SerialisedBoard
             FROM Puzzles
             WHERE PuzzleID = ?
         """, (puzzleId,))
 
-        board, solution = cur.fetchone()
+        board = cur.fetchone()[0]
         board = BoardState.deserialise(board)
-        solution = BoardState.deserialise(solution)
         
         self.__setPage(
             SudokuPage(
                 self,
                 board,
                 mainMenuCommand=self.mainMenu,
+                puzzleId=puzzleId
+            )
+        )
+
+    def loadActiveBoardFromGameID(self, gameId: int):
+        board, puzzleId = DatabaseHandler.getInitialStateFromGame(gameId)
+
+        self.__setPage(
+            SudokuPage(
+                self,
+                board,
+                mainMenuCommand=self.mainMenu,
                 puzzleId=puzzleId,
-                customSolution=solution
+                gameId=gameId
             )
         )
 
@@ -94,8 +107,10 @@ class App(ctk.CTk):
         self.__setPage(
             TechniquesLibraryPage(
                 self,
+                profileId=self.profileId,
                 mainMenuCommand=self.mainMenu,
                 loadPuzzleIdCommand=self.loadPuzzleFromId,
+                loadActiveBoardFromGameIdCommand=self.loadActiveBoardFromGameID,
                 techniquePageCommand=self.learnSpecificTechnique
             )
         )
@@ -133,18 +148,16 @@ class App(ctk.CTk):
                 Name TEXT NOT NULL UNIQUE,
                 CreatedAt TIMESTAMP DEFAULT (unixepoch())
             );
-        """) # Thank you https://stackoverflow.com/questions/11556546/sqlite-storing-default-timestamp-as-unixepoch
+        """) # Thank you https://stackoverflow.com/questions/11556546/sqlite-storing-default-timestamp-as-unixepoch and https://www.w3schools.com/sql/sql_default.asp
 
         conn.execute("""
             CREATE TABLE IF NOT EXISTS Games ( 
                 GameID INTEGER PRIMARY KEY AUTOINCREMENT, 
                 ProfileID INTEGER NOT NULL, 
                 PuzzleID INTEGER,
-                InitialBoardSerialised TEXT,
-                IsCompletedOrDiscarded BOOLEAN, 
-                GameType TEXT
+                IsCompletedOrDiscarded BOOLEAN DEFAULT False
             );
-        """)
+        """) # Thank you https://www.w3schools.com/sql/sql_default.asp
 
         conn.execute("""
             CREATE TABLE IF NOT EXISTS Moves ( 

@@ -6,11 +6,12 @@ import customtkinter as ctk
 from src.analysis import ALL_TECHNIQUE_TYPES
 from src.analysis.Technique import Technique
 from src.core.BoardState import BoardState
+from src.database import DatabaseHandler
 
 MAX_PER_ROW = 5
 
 class TechniquesLibraryPage(ctk.CTkFrame):
-    def __init__(self, master, mainMenuCommand, loadPuzzleIdCommand, techniquePageCommand, **kwargs):
+    def __init__(self, master, profileId: int | None, mainMenuCommand, loadPuzzleIdCommand, loadActiveBoardFromGameIdCommand, techniquePageCommand, **kwargs):
         super().__init__(master, **kwargs)
 
         self.mainMenuButton = ctk.CTkButton(self, text="Back to Main Menu", width=200, height=50, command=mainMenuCommand)
@@ -22,19 +23,21 @@ class TechniquesLibraryPage(ctk.CTkFrame):
         self.techniquesGrid = ctk.CTkScrollableFrame(self)
 
         for i, technique in enumerate(ALL_TECHNIQUE_TYPES):
-            widget = TechniqueWidget(self.techniquesGrid, technique=technique, loadPuzzleIdCommand=loadPuzzleIdCommand, techniquePageCommand=techniquePageCommand, statusLabel=self.statusLabel)
+            widget = TechniqueWidget(self.techniquesGrid, technique, profileId, loadPuzzleIdCommand, loadActiveBoardFromGameIdCommand, techniquePageCommand, statusLabel=self.statusLabel)
             widget.grid(column=i % MAX_PER_ROW, row=i // MAX_PER_ROW, padx=(0 if i % MAX_PER_ROW == 0 else 5, 5), pady=(5, 5))
 
         self.techniquesGrid.place(relx=0.5, rely=0.1, relwidth=1, relheight=0.8, anchor="n")
 
 
 class TechniqueWidget(ctk.CTkFrame):
-    def __init__(self, master, technique: type[Technique], loadPuzzleIdCommand, techniquePageCommand, statusLabel: ctk.CTkLabel, **kwargs): # I just want to say the type[Technique] thing is my coolest discovery yet.
+    def __init__(self, master, technique: type[Technique], profileId: int | None, loadPuzzleIdCommand, loadActiveBoardFromGameIdCommand, techniquePageCommand, statusLabel: ctk.CTkLabel, **kwargs): # I just want to say the type[Technique] thing is my coolest discovery yet.
         super().__init__(master, height=300, **kwargs)
 
+        self.profileId = profileId
         self.technique = technique
         self.statusLabel = statusLabel
         self.techniquePageCommand = techniquePageCommand
+        self.loadActiveBoardFromGameIdCommand = loadActiveBoardFromGameIdCommand
         self.loadPuzzleIdCommand = loadPuzzleIdCommand
 
         self.nameLabel = ctk.CTkLabel(self, text=technique.displayName, font=ctk.CTkFont(size=24, weight="bold"), wraplength=168)
@@ -107,4 +110,9 @@ class TechniqueWidget(ctk.CTkFrame):
         data = results[randomIndex]
 
         puzzleId = data[0]
-        self.loadPuzzleIdCommand(puzzleId)
+
+        if self.profileId is not None:
+            gameId = DatabaseHandler.createGameFromPuzzle(self.profileId, puzzleId)
+            self.loadActiveBoardFromGameIdCommand(gameId)
+        else:
+            self.loadPuzzleIdCommand(puzzleId)

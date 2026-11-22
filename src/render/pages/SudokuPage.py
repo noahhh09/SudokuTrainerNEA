@@ -9,6 +9,8 @@ from src.analysis.Technique import Technique
 from src.core.BoardState import BoardState
 from src.core.Move import Move, ValueChangeMove, CandidateChangeMove, EliminationChangeMove
 from src.core.Game import Game
+from src.core.Stack import Stack
+from src.database import DatabaseHandler
 from src.render.components.gameplay.SudokuFeed import SudokuFeed
 from src.render.components.core.SudokuControls import EditState, SudokuControls
 from src.render.components.core.SudokuGrid import SudokuGrid
@@ -28,14 +30,17 @@ except:
 
 class SudokuPage(ctk.CTkFrame):
     # puzzleId = -1 for custom board states
-    def __init__(self, master: Any, boardState: BoardState, mainMenuCommand, puzzleId=-1, customSolution: BoardState | None = None, **kwargs):
+    def __init__(self, master: Any, boardState: BoardState, mainMenuCommand, puzzleId: int = -1, gameId: int = -1, customSolution: BoardState | None = None, **kwargs):
         super().__init__(master, **kwargs)
         if DEV_MODE:
             boardState = BoardUtils.copyAndPopulateCandidates(boardState)
 
+        self.difficulty = -1 # Default for custom board states (as unknown)
+        self.useGamesTable = gameId > 0
+        self.gameId = gameId
+
         self.game = Game(boardState)
 
-        self.difficulty = -1 # Default for custom board states (as unknown)
         self.solution = customSolution
         if puzzleId > 0:
             conn = sqlite3.connect("sudoku.db")
@@ -51,7 +56,7 @@ class SudokuPage(ctk.CTkFrame):
                 self.difficulty = difficulty
 
                 if self.solution is None:
-                    self.solution = solution
+                    self.solution = BoardState.deserialise(solution)
 
             except sqlite3.OperationalError as err:
                 print(err)
@@ -71,7 +76,7 @@ class SudokuPage(ctk.CTkFrame):
         self.statusLabel.grid(row=0, column=1, sticky="ew")
 
         if self.difficulty >= 0 and puzzleId > 0:
-            self.statusLabel.configure(text=f"Puzzle ID: {puzzleId}, Difficulty: {self.difficulty}")
+            self.statusLabel.configure(text=f"Puzzle ID: {puzzleId}, Difficulty: {self.difficulty}, Game ID: {self.gameId}")
         else:
             self.statusLabel.configure(text="Custom Board State")
 
@@ -99,15 +104,27 @@ class SudokuPage(ctk.CTkFrame):
         self.hintMenu = SudokuHintMenu(self.hintsFrame, lambda: self.game.boardState, self.feed.addHint)
         self.hintMenu.grid(row=0, column=0, sticky="ew")
 
+        if self.useGamesTable:
+            moves = DatabaseHandler.getMovesFromGame(self.gameId)
+            for move in moves:
+                self.game.makeMove(move)
+
+            self.sudokuGrid.redraw()
+            self.feed.repopulate(self.game.boardState)
+
     def __undo(self):
         self.game.undoLastMove()
         self.sudokuGrid.redraw() # Heavier method since the selected cell may not be the cell affected.
         self.feed.repopulate(self.game.boardState)
+        DatabaseHandler.removeMoveNumbersGreaterThan(self.gameId, len(self.game.undoStack.items))
 
     def __redo(self):
-        self.game.redoLastMove()
-        self.sudokuGrid.redraw()
-        self.feed.repopulate(self.game.boardState)
+        lastMove = self.game.redoStack.peek()
+        if lastMove is not None:
+            self.game.redoLastMove()
+            self.sudokuGrid.redraw()
+            self.feed.repopulate(self.game.boardState)
+            DatabaseHandler.addMoveToGame(self.gameId, lastMove)
 
     def updateSelectedCellValue(self, n: int | None, editState: EditState):
         row, col = self.sudokuGrid.selectedCellPosition
@@ -139,6 +156,7 @@ class SudokuPage(ctk.CTkFrame):
             self.game.makeMove(move)
             self.sudokuGrid.redraw()
             self.feed.repopulate(self.game.boardState)
+            DatabaseHandler.addMoveToGame(self.gameId, move)
 
     def applyTechnique(self, tech: Technique):
         for move in tech.moves:

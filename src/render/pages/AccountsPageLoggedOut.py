@@ -109,6 +109,7 @@ class AccountsPageLoggedOut(ctk.CTkFrame):
             """, (name,))
 
             conn.commit()
+            # Thank you https://stackoverflow.com/questions/69287294/how-can-i-capture-the-rowid-of-newly-inserted-row-in-sqlite-flask
             id = cursor.lastrowid
             self.setIdCommand(id)
             

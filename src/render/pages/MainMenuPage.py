@@ -8,6 +8,7 @@ import tkinter as tk
 import customtkinter as ctk
 
 from src.core.BoardState import BoardState
+from src.database import DatabaseHandler
 from src.render.components.CTkRangeSlider import CTkRangeSlider
 
 DEV_MODE = False
@@ -23,10 +24,12 @@ except:
     pass # Ignores errors if no flags are specified, or other unrelated flags are.
 
 class MainMenuPage(ctk.CTkFrame):
-    def __init__(self, master: Any, profileId: int | None, loadBoardStateCommand, techniquesPageCommand, accountsPageCommand, loadPuzzleFromIdCommand, **kwargs):
+    def __init__(self, master: Any, profileId: int | None, loadBoardStateCommand, techniquesPageCommand, accountsPageCommand, loadPuzzleFromIdCommand, loadActiveBoardFromGameIdCommand, **kwargs):
         super().__init__(master, **kwargs)
 
+        self.profileId = profileId
         self.loadBoardStateCommand = loadBoardStateCommand
+        self.loadActiveBoardFromGameIdCommand = loadActiveBoardFromGameIdCommand
         self.loadPuzzleFromIdCommand = loadPuzzleFromIdCommand
 
         self.titleFont = ctk.CTkFont(size=48, weight="bold")
@@ -56,6 +59,9 @@ class MainMenuPage(ctk.CTkFrame):
 
         self.newPuzzleButton = ctk.CTkButton(self, text="New Puzzle", font=self.buttonFont, width=400, height=100, command=self.newPuzzle)
         self.newPuzzleButton.place(relx=0.5, rely=0.4, anchor="center")
+
+        self.continueButton = ctk.CTkButton(self, text="Continue recent", font=self.buttonFont, width=200, height=100, command=self.continueFromLatest)
+        self.continueButton.place(relx=0.7, rely=0.4, anchor="w")
 
         ### Objective 3. DIFFICULTY SELECT
 
@@ -146,7 +152,31 @@ class MainMenuPage(ctk.CTkFrame):
         data = results[randomIndex]
 
         puzzleId = data[0]
-        self.loadPuzzleFromIdCommand(puzzleId)
+
+        if self.profileId is not None:
+            gameId = DatabaseHandler.createGameFromPuzzle(self.profileId, puzzleId)
+            self.loadActiveBoardFromGameIdCommand(gameId)
+        else:
+            # Should never reach this point, but included for a backup.
+            self.loadPuzzleFromIdCommand(puzzleId)
+
+    def continueFromLatest(self):
+        conn = sqlite3.connect("sudoku.db")
+        cur = conn.cursor()
+
+        cur.execute("""
+            SELECT MAX(GameID)
+            FROM Games
+            WHERE ProfileID = ?
+            AND IsCompletedOrDiscarded = False
+        """, (self.profileId,))
+
+        latest = cur.fetchone()[0]
+        if latest is not None:
+            self.loadActiveBoardFromGameIdCommand(latest)
+        else:
+            self.accountLabel.configure(text="No most recent game found for this profile! Start a new puzzle!")
+            self.accountLabel.configure(fg_color='red')
 
     def getAvailableDifficultyRange(self) -> tuple[float, float]:
         conn = sqlite3.connect("sudoku.db")
