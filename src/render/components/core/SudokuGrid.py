@@ -7,6 +7,17 @@ from src.analysis import Contradictions
 from src.core.BoardState import BoardState
 from src.core.Cell import Cell
 
+# TODO: Move to constants file.
+DEFAULT_HIGHLIGHT = "white"
+CONTRADICTION_HIGHLIGHT = "#ff0000"
+INCONSISTENCY_HIGHLIGHT = "#ff7700"
+
+EDITABLE_COLOUR = "#1111ff"
+UNEDITABLE_COLOUR = "#000000"
+
+CANDIDATE_COLOUR = "#444444"
+ELIMINATION_COLOUR = "#ff0000"
+
 class SudokuGrid(ctk.CTkFrame):
     def __init__(self, master: Any, boardState: BoardState, solution: BoardState | None = None, width: int = 640, height: int = 640, **kwargs):
         super().__init__(master, width, height, fg_color="black", **kwargs)
@@ -14,7 +25,7 @@ class SudokuGrid(ctk.CTkFrame):
         self.boardState = boardState
         self.solution = solution
         self.sudokuCells: list[list[SudokuCell]] = []
-        self.selectedCellPosition: tuple[int | None, int | None] = (None, None)
+        self.selectedCellPosition: tuple[int, int] | tuple[None, None] = (None, None)
 
         for i in range(9):
             row: list[SudokuCell] = []
@@ -38,19 +49,20 @@ class SudokuGrid(ctk.CTkFrame):
 
     def selectCell(self, row, col):
         self.selectedCellPosition = (row, col)
+        print("Selected", row, col)
 
     def redraw(self):
         for i in range(9):
             for j in range(9):
                 self.sudokuCells[i][j].redraw(self.boardState.getCell(i, j))
-                self.sudokuCells[i][j].highlight("white")
+                self.sudokuCells[i][j].highlight(DEFAULT_HIGHLIGHT)
 
         self.updateInconsistenciesWithSolution()
         self.updateContradictions()
 
     def redrawCell(self, row: int, col: int):
         self.sudokuCells[row][col].redraw(self.boardState.getCell(row, col))
-        self.sudokuCells[row][col].highlight("white")
+        self.sudokuCells[row][col].highlight(DEFAULT_HIGHLIGHT)
         self.updateInconsistenciesWithSolution()
         self.updateContradictions()
 
@@ -66,7 +78,7 @@ class SudokuGrid(ctk.CTkFrame):
                 hasContra = (i, j) in cellsWithContradictions
 
                 if hasContra:
-                    self.sudokuCells[i][j].highlight("#ff0000")
+                    self.sudokuCells[i][j].highlight(CONTRADICTION_HIGHLIGHT)
 
     def updateInconsistenciesWithSolution(self):
         if self.solution is None:
@@ -81,7 +93,7 @@ class SudokuGrid(ctk.CTkFrame):
 
                 solutionValue = self.solution.getCell(i, j).getValue()
                 if solutionValue != enteredValue:
-                    self.sudokuCells[i][j].highlight("#ff7700")
+                    self.sudokuCells[i][j].highlight(INCONSISTENCY_HIGHLIGHT)
 
 
 class SudokuCell(ctk.CTkFrame):
@@ -110,7 +122,7 @@ class SudokuCell(ctk.CTkFrame):
         self.canvas.pack()
         self.canvas.bind("<Button-1>", self._onClick)
 
-    def highlight(self, colour: str = "white"):
+    def highlight(self, colour: str):
         self.canvas.configure(bg=colour)
 
     def _onClick(self, event):
@@ -128,17 +140,17 @@ class SudokuCell(ctk.CTkFrame):
         self.canvas.delete("all")
 
         if self.cell.getValue() is not None:
-            colour = "#000000" if not self.cell.isEditable() else "#1111ff" # O1.4. Non-editable cells should be clearly distinguishable from editable cells.
+            colour = UNEDITABLE_COLOUR if not self.cell.isEditable() else EDITABLE_COLOUR # O1.4. Non-editable cells should be clearly distinguishable from editable cells.
             self.canvas.create_text(self.size // 2, self.size // 2, text=str(self.cell.getValue()), font=SudokuCell.valueFont, tags="value", fill=colour)
         else:
             for candidate in self.cell.getEffectiveCandidates():
                 row = (candidate - 1) // 3
                 col = (candidate - 1) % 3
 
-                self.canvas.create_text((col + 0.5) * (self.size / 3), (row + 0.5) * (self.size / 3), font=SudokuCell.candidateFont, text=candidate, tags="candidate", fill="#444444")
+                self.canvas.create_text((col + 0.5) * (self.size / 3), (row + 0.5) * (self.size / 3), font=SudokuCell.candidateFont, text=candidate, tags="candidate", fill=CANDIDATE_COLOUR)
 
             for candidate in self.cell.getEliminatedCandidates():
                 row = (candidate - 1) // 3
                 col = (candidate - 1) % 3
 
-                self.canvas.create_text((col + 0.5) * (self.size / 3), (row + 0.5) * (self.size / 3), font=SudokuCell.eliminatedCandidateFont, text=candidate, tags="candidate", fill="#ff0000")
+                self.canvas.create_text((col + 0.5) * (self.size / 3), (row + 0.5) * (self.size / 3), font=SudokuCell.eliminatedCandidateFont, text=candidate, tags="candidate", fill=ELIMINATION_COLOUR)
